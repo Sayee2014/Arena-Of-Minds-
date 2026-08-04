@@ -17,4 +17,4 @@ if st.button("🚀 Begin Journey"):
     with col2:
         st.button("📝 Quests")
         st.button("😌 Relax Zone")
-``
+
