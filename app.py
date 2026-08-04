@@ -1,6 +1,10 @@
 import streamlit as st
 
-st.title("🏟️ Arena of Minds")
+st.set_page_config(
+    page_title="Arena of Minds",
+    page_icon="🏟️",
+    layout="wide"
+)
 
-if st.button("🚀 Begin Journey"):
-    st.write("IT WORKED 🎉")
+st.title("🏟️ Arena of Minds")
+st.subheader("Enter the Arena. Master Your Mind.")
