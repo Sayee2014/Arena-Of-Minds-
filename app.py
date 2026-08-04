@@ -1,15 +1,25 @@
-st.header("📚 Dashboard")
+import streamlit as st
 
-col1, col2, col3 = st.columns(3)
+st.title("🏟️ Arena of Minds")
+st.subheader("Enter the Arena. Master Your Mind.")
 
-with col1:
-    st.button("📚 Learn")
-    st.button("💻 Coding")
+if st.button("🚀 Begin Journey"):
+    st.success("Welcome to Arena of Minds!")
 
-with col2:
-    st.button("📝 Quests")
-    st.button("🏆 Achievements")
+    st.header("📚 Dashboard")
 
-with col3:
-    st.button("😌 Relax Zone")
-    st.button("🤖 AI Mentor")
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.button("📚 Learn")
+        st.button("💻 Coding")
+
+    with col2:
+        st.button("📝 Quests")
+        st.button("🏆 Achievements")
+
+    with col3:
+        st.button("😌 Relax Zone")
+        st.button("🤖 AI Mentor")
+
+    st.button("🔍 Just Curious")
