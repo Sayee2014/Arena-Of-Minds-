@@ -6,6 +6,8 @@ st.set_page_config(
     layout="wide"
 )
 
+# -------------------- STYLING --------------------
+
 st.markdown("""
 <style>
 
@@ -22,106 +24,121 @@ html, body, [class*="css"] {
     linear-gradient(135deg, #081C3B, #143D6B);
 }
 
-/* Title */
 .main-title {
-    text-align: center;
-    font-size: 70px;
-    font-weight: 700;
-    color: #7DF9FF;
-
-    text-shadow:
-    0 0 10px rgba(255,255,255,0.5),
-    0 0 20px rgba(125,249,255,0.7),
-    0 0 40px rgba(125,249,255,0.4);
+    text-align:center;
+    font-size:70px;
+    color:#7DF9FF;
+    font-weight:bold;
 }
 
-/* Subtitle */
 .subtitle {
-    text-align: center;
-    font-size: 26px;
-    color: #FFEAA7;
-    margin-bottom: 25px;
+    text-align:center;
+    font-size:24px;
+    color:#FFEAA7;
+    margin-bottom:20px;
 }
 
-/* Icons Row */
 .icons {
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 20px;
+    text-align:center;
+    font-size:28px;
 }
 
-/* Location Row */
-.locations {
-    text-align: center;
-    color: white;
-    font-size: 18px;
-    margin-bottom: 30px;
-}
-
-/* Button */
 div.stButton > button {
-    display: block;
-    margin: auto;
-    width: 380px;
-    height: 80px;
-
-    border-radius: 20px;
-
-    background-color: #4AA3DF;
-    color: white;
-
-    font-size: 26px;
-    font-weight: bold;
-
-    border: none;
-
-    box-shadow: 0 0 20px rgba(74,163,223,0.5);
-}
-
-div.stButton > button:hover {
-    background-color: #67B7F7;
+    border-radius:20px;
+    height:65px;
+    width:100%;
+    font-size:20px;
+    font-weight:bold;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
+# -------------------- HOME PAGE --------------------
+
 st.markdown(
-    '<div class="main-title">🏟️ Arena of Minds</div>',
+    "<div class='main-title'>🏟️ Arena of Minds</div>",
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="subtitle">Enter the Arena. Master Your Mind.</div>',
+    "<div class='subtitle'>Enter the Arena. Master Your Mind.</div>",
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="icons">🌌 ⭐ 🏆 📚 💻 🌙 🤖 ⚔️ 🎨 🚀</div>',
+    "<div class='icons'>🌌 ⭐ 🏆 📚 💻 🤖 ⚔️ 🎨 🚀</div>",
     unsafe_allow_html=True
 )
 
-st.markdown(
-    '<div class="locations">🔬 Science Valley | 💻 Tech Fortress | 😌 Serenity Gardens | 🎨 Creative Kingdom</div>',
-    unsafe_allow_html=True
-)
+st.write("")
+
+# -------------------- BEGIN JOURNEY --------------------
 
 if st.button("🚀 Begin Journey"):
-    st.success("Welcome to Arena of Minds!")
 
-    st.header("📚 Dashboard")
+    st.success("Welcome, Learner!")
+
+    # Aura and XP
+    st.info("⭐ XP: 0 | 🌌 Aura: 0")
+
+    st.header("🏟️ Central Arena")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.button("📚 Learn")
-        st.button("💻 Coding")
+
+        if st.button("📚 Learn"):
+            st.header("🔬 Science Valley")
+
+            st.write("Choose your Grade")
+
+            st.button("📚 Grade 5")
+            st.button("📚 Grade 6")
+            st.button("📚 Grade 7")
+            st.button("📚 Grade 8")
+
+        if st.button("💻 Coding"):
+            st.header("🏰 Tech Fortress")
+            st.write("Learn Python")
+            st.write("Create Projects")
+            st.write("Build Apps")
 
     with col2:
-        st.button("📝 Quests")
-        st.button("🏆 Achievements")
+
+        if st.button("📝 Quests"):
+            st.header("⚔️ Quests")
+            st.write("Complete lessons and earn XP.")
+
+        if st.button("🏆 Achievements"):
+            st.header("🏆 Achievements")
+
+            st.write("🌱 Plant Apprentice")
+            st.write("💻 Coding Rookie")
+            st.write("🌌 Future Arena Legend")
 
     with col3:
-        st.button("😌 Relax Zone")
-        st.button("🤖 AI Mentor")
 
-    st.button("🔍 Just Curious")
+        if st.button("😌 Relax Zone"):
+            st.header("🌿 Serenity Gardens")
+
+            st.success("Take a deep breath.")
+
+            st.write(
+                "🌙 You are doing better than you think."
+            )
+
+        if st.button("🤖 AI Mentor"):
+            st.header("🤖 Athena")
+
+            st.write(
+                "Hello Learner! I'm here to help."
+            )
+
+    if st.button("🔍 Just Curious"):
+
+        st.header("🌌 Curiosity Corner")
+
+        st.write("🚀 Why is space dark?")
+        st.write("🦑 Why do octopuses have three hearts?")
+        st.write("🌋 Why do volcanoes erupt?")
