@@ -6,7 +6,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# -------------------- STYLING --------------------
+# ---------------- SESSION ---------------- #
+
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+# ---------------- CSS ---------------- #
 
 st.markdown("""
 <style>
@@ -24,121 +29,110 @@ html, body, [class*="css"] {
     linear-gradient(135deg, #081C3B, #143D6B);
 }
 
+/* Title */
 .main-title {
-    text-align:center;
-    font-size:70px;
-    color:#7DF9FF;
-    font-weight:bold;
+    text-align: center;
+    font-size: 75px;
+    font-weight: bold;
+    color: #7DF9FF;
+    text-shadow: 0 0 20px rgba(125,249,255,0.7);
 }
 
+/* Subtitle */
 .subtitle {
-    text-align:center;
-    font-size:24px;
-    color:#FFEAA7;
-    margin-bottom:20px;
+    text-align: center;
+    font-size: 28px;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
+/* Icons */
 .icons {
-    text-align:center;
-    font-size:28px;
+    text-align: center;
+    font-size: 34px;
+    color: white;
+    margin-bottom: 25px;
 }
 
+/* Center Buttons */
 div.stButton > button {
-    border-radius:20px;
-    height:65px;
-    width:100%;
-    font-size:20px;
-    font-weight:bold;
+    background: white;
+    color: black;
+    height: 75px;
+    width: 100%;
+    border-radius: 20px;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+div.stButton > button:hover {
+    transform: scale(1.05);
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------- HOME PAGE --------------------
+# ---------------- HOME PAGE ---------------- #
 
-st.markdown(
-    "<div class='main-title'>🏟️ Arena of Minds</div>",
-    unsafe_allow_html=True
-)
+if st.session_state.page == "home":
 
-st.markdown(
-    "<div class='subtitle'>Enter the Arena. Master Your Mind.</div>",
-    unsafe_allow_html=True
-)
+    st.markdown(
+        '<div class="main-title">🏟️ Arena of Minds</div>',
+        unsafe_allow_html=True
+    )
 
-st.markdown(
-    "<div class='icons'>🌌 ⭐ 🏆 📚 💻 🤖 ⚔️ 🎨 🚀</div>",
-    unsafe_allow_html=True
-)
+    st.markdown(
+        '<div class="subtitle">Enter the Arena. Master Your Mind.</div>',
+        unsafe_allow_html=True
+    )
 
-st.write("")
+    st.markdown(
+        '<div class="icons">🌌 ⭐ 🏆 📚 💻 🤖 ⚔️ 🎨 🚀</div>',
+        unsafe_allow_html=True
+    )
 
-# -------------------- BEGIN JOURNEY --------------------
+    st.write("")
 
-if st.button("🚀 Begin Journey"):
+    if st.button("🚀 Begin Journey"):
+        st.session_state.page = "dashboard"
+        st.rerun()
 
-    st.success("Welcome, Learner!")
+# ---------------- DASHBOARD ---------------- #
 
-    # Aura and XP
-    st.info("⭐ XP: 0 | 🌌 Aura: 0")
+elif st.session_state.page == "dashboard":
 
-    st.header("🏟️ Central Arena")
+    st.markdown(
+        "<h1 style='text-align:center;color:white;'>🏟️ Central Arena</h1>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        "<h3 style='text-align:center;color:#FFEAA7;'>Welcome, Learner!</h3>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        "<h4 style='text-align:center;color:white;'>⭐ XP: 0 | 🌌 Aura: 0</h4>",
+        unsafe_allow_html=True
+    )
+
+    st.write("")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-
-        if st.button("📚 Learn"):
-            st.header("🔬 Science Valley")
-
-            st.write("Choose your Grade")
-
-            st.button("📚 Grade 5")
-            st.button("📚 Grade 6")
-            st.button("📚 Grade 7")
-            st.button("📚 Grade 8")
-
-        if st.button("💻 Coding"):
-            st.header("🏰 Tech Fortress")
-            st.write("Learn Python")
-            st.write("Create Projects")
-            st.write("Build Apps")
+        st.button("📚 Learn")
+        st.button("💻 Coding")
 
     with col2:
-
-        if st.button("📝 Quests"):
-            st.header("⚔️ Quests")
-            st.write("Complete lessons and earn XP.")
-
-        if st.button("🏆 Achievements"):
-            st.header("🏆 Achievements")
-
-            st.write("🌱 Plant Apprentice")
-            st.write("💻 Coding Rookie")
-            st.write("🌌 Future Arena Legend")
+        st.button("📝 Quests")
+        st.button("🏆 Achievements")
 
     with col3:
+        st.button("😌 Relax Zone")
+        st.button("🤖 AI Mentor")
 
-        if st.button("😌 Relax Zone"):
-            st.header("🌿 Serenity Gardens")
-
-            st.success("Take a deep breath.")
-
-            st.write(
-                "🌙 You are doing better than you think."
-            )
-
-        if st.button("🤖 AI Mentor"):
-            st.header("🤖 Athena")
-
-            st.write(
-                "Hello Learner! I'm here to help."
-            )
-
-    if st.button("🔍 Just Curious"):
-
-        st.header("🌌 Curiosity Corner")
-
-        st.write("🚀 Why is space dark?")
-        st.write("🦑 Why do octopuses have three hearts?")
-        st.write("🌋 Why do volcanoes erupt?")
+    st.button("🔍 Just Curious")
