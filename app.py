@@ -7,11 +7,8 @@ st.set_page_config(
 )
 
 st.markdown("""
-https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Poppins:wght@300;400;500&display=swap
-
 <style>
 
-/* Background */
 .stApp {
     background-image: url("https://i.pinimg.com/1200x/d4/58/75/d45875edac6347e1b2254dc4ea1b48bc.jpg");
     background-size: cover;
@@ -24,52 +21,61 @@ https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Poppins:wght@300
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(10, 10, 20, 0.35);
-    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(1px);
     z-index: -1;
 }
 
-/* Main content box */
+/* Remove ugly block look */
 .block-container {
-    background: rgba(20, 20, 30, 0.45);
-    border-radius: 25px;
-    padding: 2rem;
-    backdrop-filter: blur(8px);
+    padding-top: 2rem;
 }
 
 /* Title */
 h1 {
-    font-family: 'Cinzel', serif !important;
-    color: #F8E8FF !important;
     text-align: center;
-    text-shadow: 0px 0px 20px #d8b4fe;
+    font-size: 80px !important;
+    color: #FFE8FF !important;
+    text-shadow: 0px 0px 25px #f0abfc;
 }
 
-/* Headings */
-h2, h3 {
-    font-family: 'Cinzel', serif !important;
-    color: #F3D5FF !important;
+/* Subtitles */
+h2,h3 {
+    text-align: center;
+    color: #F5D0FE !important;
 }
 
-/* Normal text */
-p, div, label {
-    font-family: 'Poppins', sans-serif !important;
+/* Text */
+p,div,label {
+    text-align: center;
     color: white !important;
+    font-size: 24px !important;
 }
 
 /* Buttons */
 .stButton > button {
-    background: linear-gradient(135deg,#a855f7,#7e22ce);
-    color: white;
-    border-radius: 15px;
-    border: none;
+    width: 100%;
+    height: 80px;
+    font-size: 24px;
     font-weight: bold;
+
+    border-radius: 20px;
+    border: none;
+
+    color: white;
+
+    background: linear-gradient(
+        135deg,
+        #d946ef,
+        #9333ea
+    );
+
+    transition: 0.3s;
 }
 
-/* Selectbox */
-div[data-baseweb="select"] {
-    background-color: rgba(255,255,255,0.1);
-    border-radius: 10px;
+.stButton > button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 20px #d946ef;
 }
 
 </style>
@@ -78,48 +84,37 @@ div[data-baseweb="select"] {
 st.title("🌸 Arena of Minds 🌸")
 
 st.markdown("""
-### ✨ Welcome to the Wisteria Courtyard
+## ✨ Welcome to the Wisteria Courtyard ✨
 
-Beneath the glowing wisteria blossoms lies a realm of learning, creativity, and discovery.
+Beneath the glowing wisteria blossoms lies a realm of learning,
+creativity and discovery.
 
-Choose your destination and begin your adventure.
+Choose your destination and begin your journey.
 """)
 
-page = st.selectbox(
-    "🌙 Travel To",
-    [
-        "🌸 Wisteria Courtyard",
-        "🔬 Science Valley",
-        "💻 Tech Fortress",
-        "🤖 Athena Tower",
-        "🌿 Serenity Gardens"
-    ]
-)
+st.write("")
+st.write("")
 
-if page == "🌸 Wisteria Courtyard":
-    st.header("🌸 Wisteria Courtyard")
-    st.write("The heart of Arena of Minds. Start your journey here.")
+col1, col2 = st.columns(2)
 
-elif page == "🔬 Science Valley":
-    st.header("🔬 Science Valley")
-    st.write("Explore experiments, discoveries, and the wonders of science.")
+with col1:
 
-elif page == "💻 Tech Fortress":
-    st.header("💻 Tech Fortress")
-    st.write("Train your coding skills and build awesome projects.")
+    if st.button("🔬 Science Valley"):
+        st.switch_page("pages/Science_Valley.py")
 
-elif page == "🤖 Athena Tower":
-    st.header("🤖 Athena Tower")
-    question = st.text_input("Ask Athena a question")
+    if st.button("🤖 Athena Tower"):
+        st.switch_page("pages/Athena_Tower.py")
 
-    if question:
-        st.success("Athena says: Every master was once a beginner.")
+with col2:
 
-elif page == "🌿 Serenity Gardens":
-    st.header("🌿 Serenity Gardens")
-    st.write("Take a deep breath and recharge your mind.")
+    if st.button("💻 Tech Fortress"):
+        st.switch_page("pages/Tech_Fortress.py")
 
-st.divider()
+    if st.button("🌿 Serenity Gardens"):
+        st.switch_page("pages/Serenity_Gardens.py")
+
+st.write("")
+st.write("")
 
 st.markdown("""
 ### 🌸 Grow your mind like a wisteria vine. 🌸
