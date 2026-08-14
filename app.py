@@ -1,45 +1,28 @@
 import streamlit as st
 
-st.set_page_config(page_title="Arena of Minds", page_icon="🏟️")
+st.markdown("""
+<style>
 
-st.title("🏟️ Arena of Minds")
-st.subheader("Learn • Explore • Grow")
+.stApp {
+    background-image: url("https://images.unsplash.com/photo-1519681393784-d120267933ba");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
 
-name = st.text_input("Enter your name")
+h1, h2, h3, p, label {
+    color: white !important;
+}
 
-if name:
-    st.success(f"Welcome, {name}!")
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
 
-location = st.selectbox(
-    "Choose a location",
-    [
-        "Science Valley 🔬",
-        "Tech Fortress 💻",
-        "Serenity Gardens 🌿",
-        "Athena Tower 🤖"
-    ]
-)
+.main {
+    background-color: rgba(0, 0, 0, 0.55);
+    padding: 20px;
+    border-radius: 15px;
+}
 
-if location == "Science Valley 🔬":
-    st.header("🔬 Science Valley")
-    st.write("Discover experiments and scientific knowledge!")
-
-elif location == "Tech Fortress 💻":
-    st.header("💻 Tech Fortress")
-    st.write("Practice coding and build amazing projects!")
-
-elif location == "Serenity Gardens 🌿":
-    st.header("🌿 Serenity Gardens")
-    st.write("Take a break and recharge your mind.")
-
-elif location == "Athena Tower 🤖":
-    st.header("🤖 Athena Tower")
-    question = st.text_input("Ask Athena a question")
-    
-    if question:
-        st.write("Athena says:")
-        st.info("Keep learning. Every expert was once a beginner.")
-
-st.divider()
-
-st.write("⭐ Arena of Minds Version 1.0")
+</style>
+""", unsafe_allow_html=True)
