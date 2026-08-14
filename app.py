@@ -7,7 +7,12 @@ st.set_page_config(
 )
 
 st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="
+https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Poppins:wght@300;400;500&display=swap
+
+<style>
+
+/* Background */
+.stApp {
     background-image: url("https://i.pinimg.com/1200x/d4/58/75/d45875edac6347e1b2254dc4ea1b48bc.jpg");
     background-size: cover;
     background-position: center;
@@ -15,18 +20,16 @@ st.markdown("""
 }
 
 /* Dark overlay */
-
 .stApp::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(10, 10, 20, 0.30);
+    background: rgba(10, 10, 20, 0.35);
     backdrop-filter: blur(4px);
     z-index: -1;
 }
 
 /* Main content box */
-
 .block-container {
     background: rgba(20, 20, 30, 0.45);
     border-radius: 25px;
@@ -35,7 +38,6 @@ st.markdown("""
 }
 
 /* Title */
-
 h1 {
     font-family: 'Cinzel', serif !important;
     color: #F8E8FF !important;
@@ -44,34 +46,30 @@ h1 {
 }
 
 /* Headings */
-
 h2, h3 {
     font-family: 'Cinzel', serif !important;
     color: #F3D5FF !important;
 }
 
-/* Text */
-
+/* Normal text */
 p, div, label {
     font-family: 'Poppins', sans-serif !important;
     color: white !important;
-    font-size: 18px;
-}
-
-/* Selectbox */
-
-.stSelectbox {
-    background-color: rgba(255,255,255,0.05);
 }
 
 /* Buttons */
-
 .stButton > button {
     background: linear-gradient(135deg,#a855f7,#7e22ce);
     color: white;
     border-radius: 15px;
     border: none;
     font-weight: bold;
+}
+
+/* Selectbox */
+div[data-baseweb="select"] {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 10px;
 }
 
 </style>
@@ -82,7 +80,7 @@ st.title("🌸 Arena of Minds 🌸")
 st.markdown("""
 ### ✨ Welcome to the Wisteria Courtyard
 
-Beneath the ancient wisteria blossoms lies a realm of learning, creativity, and discovery.
+Beneath the glowing wisteria blossoms lies a realm of learning, creativity, and discovery.
 
 Choose your destination and begin your adventure.
 """)
@@ -104,7 +102,7 @@ if page == "🌸 Wisteria Courtyard":
 
 elif page == "🔬 Science Valley":
     st.header("🔬 Science Valley")
-    st.write("Explore experiments, discoveries and the wonders of science.")
+    st.write("Explore experiments, discoveries, and the wonders of science.")
 
 elif page == "💻 Tech Fortress":
     st.header("💻 Tech Fortress")
@@ -115,7 +113,7 @@ elif page == "🤖 Athena Tower":
     question = st.text_input("Ask Athena a question")
 
     if question:
-        st.success("Athena says: Keep learning. Every master was once a beginner.")
+        st.success("Athena says: Every master was once a beginner.")
 
 elif page == "🌿 Serenity Gardens":
     st.header("🌿 Serenity Gardens")
@@ -124,9 +122,5 @@ elif page == "🌿 Serenity Gardens":
 st.divider()
 
 st.markdown("""
-<center>
-
-🌸 <b>Grow your mind like a wisteria vine.</b> 🌸
-
-</center>
-""", unsafe_allow_html=True)
+### 🌸 Grow your mind like a wisteria vine. 🌸
+""")
