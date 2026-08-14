@@ -24,60 +24,59 @@ st.markdown("""
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.78);
+    background: rgba(0,0,0,0.75);
     backdrop-filter: blur(1px);
     z-index: -1;
-}
-
-/* Main area */
-
-.block-container {
-    padding-top: 2rem;
 }
 
 /* Title */
 
 h1 {
     text-align: center;
-    font-size: 85px !important;
     color: white !important;
+    font-size: 85px !important;
 
     text-shadow:
-        0 0 10px black,
-        0 0 20px black,
-        0 0 30px black;
+        0px 0px 10px black,
+        0px 0px 20px black,
+        0px 0px 30px black;
 }
 
 /* Headings */
 
 h2 {
     text-align: center;
+    color: #FFE5FF !important;
     font-size: 42px !important;
 
-    color: #FFE5FF !important;
-
     text-shadow:
-        0 0 10px black;
+        0px 0px 10px black;
 }
 
-/* Text */
+/* Paragraphs */
 
-p, div, label {
+p {
     text-align: center;
     color: white !important;
     font-size: 24px !important;
 
     text-shadow:
-        2px 2px 8px rgba(0,0,0,0.9);
+        2px 2px 10px rgba(0,0,0,1);
 }
 
-/* Welcome card */
+/* Hero Card */
 
 .hero-box {
+
     background: rgba(0,0,0,0.45);
+
     padding: 35px;
+
     border-radius: 25px;
-    margin-bottom: 35px;
+
+    margin-top: 20px;
+    margin-bottom: 40px;
+
     backdrop-filter: blur(3px);
 }
 
@@ -86,15 +85,15 @@ p, div, label {
 .stButton > button {
 
     width: 100% !important;
-    height: 95px !important;
+    height: 90px !important;
 
-    font-size: 26px !important;
+    font-size: 24px !important;
     font-weight: bold !important;
+
+    color: white !important;
 
     border-radius: 20px !important;
     border: none !important;
-
-    color: white !important;
 
     background: linear-gradient(
         135deg,
@@ -110,10 +109,10 @@ p, div, label {
 
 .stButton > button:hover {
 
-    transform: scale(1.05);
+    transform: scale(1.04);
 
     box-shadow:
-        0px 0px 25px rgba(232,121,249,0.9);
+        0px 0px 25px rgba(232,121,249,1);
 }
 
 </style>
@@ -124,11 +123,15 @@ st.title("🌸 Arena of Minds 🌸")
 st.markdown("""
 <div class="hero-box">
 
-<h2>✨ Welcome to the Wisteria Courtyard ✨</h2>
+<h2>🏟️ Welcome to Arena of Minds 🏟️</h2>
 
 <p>
-Beneath the glowing wisteria blossoms lies a realm of learning,
-creativity and discovery.
+Step into a world of curiosity, creativity, and discovery.
+</p>
+
+<p>
+Every challenge is a quest.<br>
+Every lesson is an adventure.
 </p>
 
 <p>
@@ -145,10 +148,19 @@ with col1:
     if st.button("🔬 Science Valley", use_container_width=True):
         st.switch_page("pages/Science_Valley.py")
 
+    if st.button("📚 Scholar's Library", use_container_width=True):
+        st.switch_page("pages/Scholars_Library.py")
+
     if st.button("🤖 Athena Tower", use_container_width=True):
         st.switch_page("pages/Athena_Tower.py")
 
+    if st.button("🎨 Creative Kingdom", use_container_width=True):
+        st.switch_page("pages/Creative_Kingdom.py")
+
 with col2:
+
+    if st.button("🧮 Math Kingdom", use_container_width=True):
+        st.switch_page("pages/Math_Kingdom.py")
 
     if st.button("💻 Tech Fortress", use_container_width=True):
         st.switch_page("pages/Tech_Fortress.py")
@@ -156,10 +168,17 @@ with col2:
     if st.button("🌿 Serenity Gardens", use_container_width=True):
         st.switch_page("pages/Serenity_Gardens.py")
 
-st.write("")
+st.markdown(
+"""
+<div style='text-align:center; margin-top:30px;'>
 
-st.markdown("""
-<h3 style="text-align:center; color:#FFD9FF;">
+<h3 style='color:#FFD9FF;'>
+
 🌸 Grow your mind like a wisteria vine. 🌸
+
 </h3>
-""", unsafe_allow_html=True)
+
+</div>
+""",
+unsafe_allow_html=True
+)
