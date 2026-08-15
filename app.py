@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# DATA
+# DEFAULT DATA
 # ============================================================
 
 DEFAULT_DATA = {
@@ -30,6 +30,10 @@ DEFAULT_DATA = {
     "challenges_completed": 0
 }
 
+
+# ============================================================
+# LOAD / SAVE DATA
+# ============================================================
 
 def load_data():
     if os.path.exists(SAVE_FILE):
@@ -47,6 +51,10 @@ def save_data():
         json.dump(st.session_state.player, file, indent=4)
 
 
+# ============================================================
+# SESSION STATE
+# ============================================================
+
 if "player" not in st.session_state:
     st.session_state.player = load_data()
 
@@ -58,6 +66,7 @@ if "game" not in st.session_state:
 
 if "current_question" not in st.session_state:
     st.session_state.current_question = None
+
 
 player = st.session_state.player
 
@@ -86,9 +95,7 @@ def add_rewards(xp=0, aura=0):
     save_data()
 
     if leveled_up:
-
         st.balloons()
-
         st.success(
             f"🔥 LEVEL UP! You reached Level {player['level']}!"
         )
@@ -100,43 +107,33 @@ def add_rewards(xp=0, aura=0):
 
 def get_background():
 
-    if os.path.exists(BACKGROUND_IMAGE):
+    if not os.path.exists(BACKGROUND_IMAGE):
+        return ""
 
-        try:
+    try:
+        with open(BACKGROUND_IMAGE, "rb") as image_file:
+            encoded = base64.b64encode(
+                image_file.read()
+            ).decode()
 
-            with open(
-                BACKGROUND_IMAGE,
-                "rb"
-            ) as image_file:
+        return encoded
 
-                encoded = base64.b64encode(
-                    image_file.read()
-                ).decode()
-
-            return f"data:image/jpeg;base64,{encoded}"
-
-        except:
-            return ""
-
-    return ""
+    except:
+        return ""
 
 
 background = get_background()
 
-
-# ============================================================
-# CSS
-# ============================================================
 
 if background:
 
     background_css = f"""
     background-image:
         linear-gradient(
-            rgba(8, 30, 75, 0.35),
-            rgba(3, 18, 55, 0.75)
+            rgba(5, 35, 90, 0.35),
+            rgba(3, 25, 70, 0.75)
         ),
-        url("{background}");
+        url("data:image/jpeg;base64,{background}");
     """
 
 else:
@@ -145,438 +142,260 @@ else:
     background-image:
         radial-gradient(
             circle at 50% 10%,
-            #164c91 0%,
-            #0b2e63 30%,
-            #061a3b 65%,
-            #031027 100%
+            #1765b5 0%,
+            #0b4385 30%,
+            #062b5c 60%,
+            #031b3d 100%
         );
     """
 
+
+# ============================================================
+# CSS
+# ============================================================
 
 st.markdown(
     f"""
 <style>
 
-/* ============================================================
-   MAIN BACKGROUND
-   ============================================================ */
-
 .stApp {{
-
     {background_css}
-
     background-size: cover;
-
     background-position: center;
-
     background-attachment: fixed;
-
     color: white;
-
     min-height: 100vh;
 }}
 
-
-/* ============================================================
-   BLUE ATMOSPHERIC OVERLAY
-   ============================================================ */
-
 .stApp::before {{
-
     content: "";
-
     position: fixed;
-
     inset: 0;
-
     pointer-events: none;
-
     background:
         radial-gradient(
-            circle at 20% 20%,
-            rgba(30,120,255,0.18),
+            circle at 15% 20%,
+            rgba(0, 150, 255, 0.18),
             transparent 30%
         ),
-
         radial-gradient(
-            circle at 80% 70%,
-            rgba(0,170,255,0.15),
+            circle at 85% 75%,
+            rgba(0, 110, 255, 0.16),
             transparent 30%
         );
-
     z-index: 0;
 }}
 
-
-/* ============================================================
-   CONTENT
-   ============================================================ */
-
 .block-container {{
-
     position: relative;
-
     z-index: 1;
-
     max-width: 1250px;
-
     padding-top: 25px;
-
-    padding-bottom: 50px;
+    padding-bottom: 60px;
 }}
 
-
-/* ============================================================
-   BOUNCY TITLE
-   ============================================================ */
+/* ================= TITLE ================= */
 
 .aom-title {{
-
     text-align: center;
-
-    font-family:
-        "Comic Sans MS",
-        "Trebuchet MS",
-        sans-serif;
-
+    font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
     font-size: 60px;
-
     font-weight: 900;
-
     letter-spacing: 4px;
-
-    color: #ffffff;
-
+    color: white;
     text-shadow:
-
         4px 4px 0px #0755b8,
-
         0px 0px 12px #39a9ff,
-
         0px 0px 30px #0077ff;
-
     animation: bounceTitle 2s infinite;
-
     margin-bottom: 4px;
 }}
 
-
 @keyframes bounceTitle {{
-
     0%, 100% {{
-        transform:
-            translateY(0px)
-            rotate(-1deg);
+        transform: translateY(0px) rotate(-1deg);
     }}
-
     50% {{
-        transform:
-            translateY(-8px)
-            rotate(1deg);
+        transform: translateY(-8px) rotate(1deg);
     }}
-
 }}
 
-
-/* ============================================================
-   SUBTITLE
-   ============================================================ */
-
 .aom-subtitle {{
-
     text-align: center;
-
     color: #b9ddff;
-
     font-size: 14px;
-
     font-weight: bold;
-
     letter-spacing: 6px;
-
     margin-bottom: 30px;
 }}
 
-
-/* ============================================================
-   SECTION TITLE
-   ============================================================ */
+/* ================= SECTION TITLES ================= */
 
 .section-title {{
-
     text-align: center;
-
-    font-family:
-        "Comic Sans MS",
-        "Trebuchet MS",
-        sans-serif;
-
+    font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
     font-size: 34px;
-
     font-weight: 900;
-
     color: white;
-
     text-shadow:
-
         3px 3px 0px #0755b8,
-
         0px 0px 15px #1e9bff;
-
     margin: 25px 0;
 }}
 
-
-/* ============================================================
-   CARDS
-   ============================================================ */
+/* ================= CARDS ================= */
 
 .card {{
-
     background:
         linear-gradient(
             145deg,
-            rgba(5, 35, 80, 0.88),
-            rgba(8, 57, 115, 0.88)
+            rgba(5, 35, 80, 0.92),
+            rgba(8, 67, 135, 0.92)
         );
-
-    border:
-
-        1px solid
-        rgba(70, 170, 255, 0.5);
-
+    border: 1px solid rgba(70, 180, 255, 0.55);
     border-radius: 22px;
-
     padding: 25px;
-
     margin: 10px 0;
-
     box-shadow:
-
-        0px 10px 35px
-        rgba(0, 70, 160, 0.35);
-
+        0px 10px 35px rgba(0, 70, 160, 0.35);
     backdrop-filter: blur(8px);
 }}
 
-
-/* ============================================================
-   STAT CARDS
-   ============================================================ */
+/* ================= STAT CARDS ================= */
 
 .stat {{
-
     background:
         linear-gradient(
             145deg,
-            rgba(5, 38, 85, 0.92),
-            rgba(8, 63, 125, 0.92)
+            rgba(5, 38, 85, 0.96),
+            rgba(8, 70, 140, 0.96)
         );
-
-    border:
-        1px solid
-        rgba(80, 180, 255, 0.55);
-
+    border: 1px solid rgba(80, 190, 255, 0.6);
     border-radius: 20px;
-
     padding: 22px;
-
     text-align: center;
-
     box-shadow:
-        0px 8px 25px
-        rgba(0,80,180,0.35);
-
-    transition:
-        transform 0.2s;
+        0px 8px 25px rgba(0, 80, 180, 0.35);
+    transition: transform 0.2s;
 }}
-
 
 .stat:hover {{
-
-    transform:
-        translateY(-5px);
+    transform: translateY(-5px);
 }}
 
-
 .stat-title {{
-
     color: #a9d9ff;
-
     font-size: 14px;
-
     font-weight: bold;
 }}
 
-
 .stat-value {{
-
     font-size: 34px;
-
     font-weight: 900;
-
     color: white;
-
-    text-shadow:
-        0px 0px 10px #168fff;
+    text-shadow: 0px 0px 10px #168fff;
 }}
 
-
-/* ============================================================
-   GAME CARDS
-   ============================================================ */
+/* ================= GAME CARDS ================= */
 
 .game-card {{
-
     background:
         linear-gradient(
             145deg,
-            rgba(5, 35, 80, 0.93),
-            rgba(9, 67, 130, 0.93)
+            rgba(5, 35, 80, 0.95),
+            rgba(9, 67, 135, 0.95)
         );
-
-    border:
-        1px solid
-        rgba(60, 165, 255, 0.55);
-
+    border: 1px solid rgba(60, 175, 255, 0.6);
     border-radius: 24px;
-
     padding: 28px;
-
     text-align: center;
-
     min-height: 160px;
-
     box-shadow:
-        0px 10px 30px
-        rgba(0,60,150,0.4);
-
+        0px 10px 30px rgba(0, 60, 150, 0.4);
     transition:
         transform 0.2s,
         box-shadow 0.2s;
 }}
 
-
 .game-card:hover {{
-
-    transform:
-        translateY(-7px)
-        scale(1.01);
-
+    transform: translateY(-7px) scale(1.01);
     box-shadow:
-        0px 15px 40px
-        rgba(0,130,255,0.35);
+        0px 15px 40px rgba(0, 140, 255, 0.4);
 }}
 
-
 .game-title {{
-
     font-size: 22px;
-
     font-weight: 900;
-
     color: white;
 }}
 
-
 .game-description {{
-
     color: #b8dcff;
-
     font-size: 13px;
-
     margin-top: 8px;
 }}
 
-
-/* ============================================================
-   BUTTONS
-   ============================================================ */
+/* ================= BUTTONS ================= */
 
 .stButton > button {{
-
     border-radius: 14px;
-
-    border:
-        1px solid
-        rgba(70, 175, 255, 0.65);
-
+    border: 1px solid rgba(70, 180, 255, 0.7);
     background:
         linear-gradient(
             135deg,
             #0755b8,
             #087bd1
         );
-
     color: white;
-
     font-weight: 900;
-
     min-height: 45px;
-
     transition:
         transform 0.15s,
         box-shadow 0.15s;
 }}
 
-
 .stButton > button:hover {{
-
-    transform:
-        translateY(-3px);
-
+    transform: translateY(-3px);
     box-shadow:
-        0px 8px 25px
-        rgba(0,140,255,0.5);
-
-    border-color:
-        #65c5ff;
+        0px 8px 25px rgba(0, 140, 255, 0.5);
+    border-color: #65c5ff;
 }}
 
-
-/* ============================================================
-   INPUTS
-   ============================================================ */
+/* ================= INPUTS ================= */
 
 .stTextInput input {{
-
-    background:
-        rgba(5, 30, 70, 0.9);
-
+    background: rgba(5, 30, 70, 0.95);
     color: white;
-
-    border:
-        1px solid #237bc7;
-
+    border: 1px solid #237bc7;
     border-radius: 12px;
 }}
 
+.stTextInput label {{
+    color: white !important;
+    font-weight: bold;
+}}
 
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
+/* ================= SIDEBAR ================= */
 
 section[data-testid="stSidebar"] {{
-
     background:
         linear-gradient(
             180deg,
             rgba(3, 25, 58, 0.98),
-            rgba(3, 45, 90, 0.98)
+            rgba(3, 50, 100, 0.98)
         );
-
     border-right:
-        1px solid
-        rgba(40,150,255,0.35);
+        1px solid rgba(40, 150, 255, 0.4);
 }}
 
+section[data-testid="stSidebar"] .stButton > button {{
+    min-height: 55px;
+    font-size: 16px;
+}}
 
-/* ============================================================
-   PROGRESS
-   ============================================================ */
+/* ================= PROGRESS ================= */
 
 .stProgress > div > div > div > div {{
-
     background:
         linear-gradient(
             90deg,
@@ -585,10 +404,7 @@ section[data-testid="stSidebar"] {{
         );
 }}
 
-
-/* ============================================================
-   HIDE STREAMLIT UI
-   ============================================================ */
+/* ================= STREAMLIT UI ================= */
 
 #MainMenu {{
     visibility: hidden;
@@ -611,22 +427,18 @@ footer {{
 def show_title():
 
     st.markdown(
-        '<div class="aom-title">'
-        '⚔️ ARENA OF MINDS ⚔️'
-        '</div>',
+        """<div class="aom-title">⚔️ ARENA OF MINDS ⚔️</div>""",
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="aom-subtitle">'
-        'LEARN • CHALLENGE • CONQUER'
-        '</div>',
+        """<div class="aom-subtitle">LEARN • CHALLENGE • CONQUER</div>""",
         unsafe_allow_html=True
     )
 
 
 # ============================================================
-# SETUP
+# SETUP PAGE
 # ============================================================
 
 def setup_page():
@@ -634,47 +446,26 @@ def setup_page():
     show_title()
 
     st.markdown(
-        '<div class="section-title">'
-        'WELCOME, FUTURE CHAMPION'
-        '</div>',
+        """<div class="section-title">WELCOME, FUTURE CHAMPION</div>""",
         unsafe_allow_html=True
     )
 
-    left, center, right = st.columns(
-        [1, 2, 1]
-    )
+    left, center, right = st.columns([1, 2, 1])
 
     with center:
 
         st.markdown(
-            """
-            <div class="card"
-                 style="text-align:center;">
-
-                <div style="font-size:60px;">
-                🌙
-                </div>
-
-                <h2>
-                ENTER THE ARENA
-                </h2>
-
-                <p>
-                Begin your journey.
-                </p>
-
-            </div>
-            """,
+            """<div class="card" style="text-align:center;">
+<div style="font-size:60px;">🌙</div>
+<h2>ENTER THE ARENA</h2>
+<p>Begin your journey.</p>
+</div>""",
             unsafe_allow_html=True
         )
 
-        name = st.text_input(
-            "👤 What's your name?"
-        )
+        name = st.text_input("👤 What's your name?")
 
-        grade = st.text_input(
-            "🎓 What's your grade?"
-        )
+        grade = st.text_input("🎓 What's your grade?")
 
         if st.button(
             "⚔️ START YOUR JOURNEY",
@@ -683,28 +474,19 @@ def setup_page():
 
             if not name.strip():
 
-                st.warning(
-                    "Please enter your name."
-                )
+                st.warning("Please enter your name.")
 
             elif not grade.strip():
 
-                st.warning(
-                    "Please enter your grade."
-                )
+                st.warning("Please enter your grade.")
 
             else:
 
                 player["name"] = name.strip()
-
                 player["grade"] = grade.strip()
-
                 player["xp"] = 0
-
                 player["aura"] = 0
-
                 player["level"] = 1
-
                 player["challenges_completed"] = 0
 
                 save_data()
@@ -723,17 +505,13 @@ def show_sidebar():
     with st.sidebar:
 
         st.markdown(
-            """
-            <div style="
-                text-align:center;
-                font-size:26px;
-                font-weight:900;
-                color:#55baff;
-                text-shadow:0 0 12px #008cff;
-            ">
-            ⚔️ ARENA
-            </div>
-            """,
+            """<div style="
+text-align:center;
+font-size:27px;
+font-weight:900;
+color:#55baff;
+text-shadow:0 0 12px #008cff;
+">⚔️ ARENA</div>""",
             unsafe_allow_html=True
         )
 
@@ -749,71 +527,45 @@ def show_sidebar():
 
         st.divider()
 
-        if st.button(
-            "🏠 HOME",
-            use_container_width=True
-        ):
+        if st.button("🏠 HOME", use_container_width=True):
 
             st.session_state.page = "home"
             st.rerun()
 
-        if st.button(
-            "📚 STUDY",
-            use_container_width=True
-        ):
+        if st.button("📚 STUDY", use_container_width=True):
 
             st.session_state.page = "study"
             st.rerun()
 
-        if st.button(
-            "⚔️ CHALLENGES",
-            use_container_width=True
-        ):
+        if st.button("⚔️ CHALLENGES", use_container_width=True):
 
             st.session_state.page = "challenges"
             st.rerun()
 
-        if st.button(
-            "🏆 RANKS",
-            use_container_width=True
-        ):
+        if st.button("🏆 RANKS", use_container_width=True):
 
             st.session_state.page = "ranks"
             st.rerun()
 
-        if st.button(
-            "👤 PROFILE",
-            use_container_width=True
-        ):
+        if st.button("👤 PROFILE", use_container_width=True):
 
             st.session_state.page = "profile"
             st.rerun()
 
-        if st.button(
-            "🌙 CHILL",
-            use_container_width=True
-        ):
+        if st.button("🌙 CHILL", use_container_width=True):
 
             st.session_state.page = "chill"
             st.rerun()
 
         st.divider()
 
-        st.caption(
-            f"⭐ XP: {player['xp']}"
-        )
-
-        st.caption(
-            f"✨ Aura: {player['aura']}"
-        )
-
-        st.caption(
-            f"🏆 Level: {player['level']}"
-        )
+        st.caption(f"⭐ XP: {player['xp']}")
+        st.caption(f"✨ Aura: {player['aura']}")
+        st.caption(f"🏆 Level: {player['level']}")
 
 
 # ============================================================
-# HOME
+# HOME PAGE
 # ============================================================
 
 def home_page():
@@ -821,21 +573,10 @@ def home_page():
     show_title()
 
     st.markdown(
-        f"""
-        <div class="card">
-
-            <h2>
-            Welcome, {player['name']}! 👋
-            </h2>
-
-            <p>
-            🎓 Grade {player['grade']}
-            &nbsp; • &nbsp;
-            🏆 Level {player['level']}
-            </p>
-
-        </div>
-        """,
+        f"""<div class="card">
+<h2>Welcome, {player['name']}! 👋</h2>
+<p>🎓 Grade {player['grade']} &nbsp; • &nbsp; 🏆 Level {player['level']}</p>
+</div>""",
         unsafe_allow_html=True
     )
 
@@ -846,57 +587,30 @@ def home_page():
     with c1:
 
         st.markdown(
-            f"""
-            <div class="stat">
-
-                <div class="stat-title">
-                ⭐ XP
-                </div>
-
-                <div class="stat-value">
-                {player['xp']}
-                </div>
-
-            </div>
-            """,
+            f"""<div class="stat">
+<div class="stat-title">⭐ XP</div>
+<div class="stat-value">{player['xp']}</div>
+</div>""",
             unsafe_allow_html=True
         )
 
     with c2:
 
         st.markdown(
-            f"""
-            <div class="stat">
-
-                <div class="stat-title">
-                ✨ AURA
-                </div>
-
-                <div class="stat-value">
-                {player['aura']}
-                </div>
-
-            </div>
-            """,
+            f"""<div class="stat">
+<div class="stat-title">✨ AURA</div>
+<div class="stat-value">{player['aura']}</div>
+</div>""",
             unsafe_allow_html=True
         )
 
     with c3:
 
         st.markdown(
-            f"""
-            <div class="stat">
-
-                <div class="stat-title">
-                🏆 LEVEL
-                </div>
-
-                <div class="stat-value">
-                {player['level']}
-                </div>
-
-            </div>
-            """,
+            f"""<div class="stat">
+<div class="stat-title">🏆 LEVEL</div>
+<div class="stat-value">{player['level']}</div>
+</div>""",
             unsafe_allow_html=True
         )
 
@@ -907,28 +621,18 @@ def home_page():
     progress = player["xp"] / required
 
     st.markdown(
-        f"""
-        <div class="card">
-
-        <b>
-        🏆 LEVEL {player['level']} PROGRESS
-        </b>
-
-        <br><br>
-
-        ⭐ {player['xp']} / {required} XP
-
-        </div>
-        """,
+        f"""<div class="card">
+<b>🏆 LEVEL {player['level']} PROGRESS</b>
+<br><br>
+⭐ {player['xp']} / {required} XP
+</div>""",
         unsafe_allow_html=True
     )
 
     st.progress(progress)
 
     st.markdown(
-        '<div class="section-title">'
-        '🔥 ENTER THE ARENA'
-        '</div>',
+        """<div class="section-title">🔥 ENTER THE ARENA</div>""",
         unsafe_allow_html=True
     )
 
@@ -937,23 +641,11 @@ def home_page():
     with c1:
 
         st.markdown(
-            """
-            <div class="game-card">
-
-                <div style="font-size:45px;">
-                📚
-                </div>
-
-                <div class="game-title">
-                STUDY
-                </div>
-
-                <div class="game-description">
-                Turn learning into games.
-                </div>
-
-            </div>
-            """,
+            """<div class="game-card">
+<div style="font-size:45px;">📚</div>
+<div class="game-title">STUDY</div>
+<div class="game-description">Turn learning into games.</div>
+</div>""",
             unsafe_allow_html=True
         )
 
@@ -969,23 +661,11 @@ def home_page():
     with c2:
 
         st.markdown(
-            """
-            <div class="game-card">
-
-                <div style="font-size:45px;">
-                ⚔️
-                </div>
-
-                <div class="game-title">
-                CHALLENGES
-                </div>
-
-                <div class="game-description">
-                Complete challenges and earn rewards.
-                </div>
-
-            </div>
-            """,
+            """<div class="game-card">
+<div style="font-size:45px;">⚔️</div>
+<div class="game-title">CHALLENGES</div>
+<div class="game-description">Complete challenges and earn rewards.</div>
+</div>""",
             unsafe_allow_html=True
         )
 
@@ -1001,23 +681,11 @@ def home_page():
     with c3:
 
         st.markdown(
-            """
-            <div class="game-card">
-
-                <div style="font-size:45px;">
-                🌙
-                </div>
-
-                <div class="game-title">
-                CHILL
-                </div>
-
-                <div class="game-description">
-                Take a break from the arena.
-                </div>
-
-            </div>
-            """,
+            """<div class="game-card">
+<div style="font-size:45px;">🌙</div>
+<div class="game-title">CHILL</div>
+<div class="game-description">Take a break from the arena.</div>
+</div>""",
             unsafe_allow_html=True
         )
 
@@ -1029,121 +697,6 @@ def home_page():
 
             st.session_state.page = "chill"
             st.rerun()
-
-
-# ============================================================
-# STUDY
-# ============================================================
-
-def study_page():
-
-    show_title()
-
-    st.markdown(
-        '<div class="section-title">'
-        '📚 STUDY ARENA'
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-    st.write(
-        "Choose your learning game."
-    )
-
-    games = [
-
-        (
-            "➗",
-            "MATH MAZE",
-            "Solve maths questions to escape the maze.",
-            "math"
-        ),
-
-        (
-            "🔬",
-            "SCIENCE LAB",
-            "Experiment, think and solve.",
-            "science"
-        ),
-
-        (
-            "⚔️",
-            "SST CHRONICLES",
-            "History, geography and civics.",
-            "sst"
-        ),
-
-        (
-            "🇮🇳",
-            "HINDI HUNT",
-            "Grammar and vocabulary.",
-            "hindi"
-        ),
-
-        (
-            "🇬🇧",
-            "WORD BATTLE",
-            "Battle your way through English.",
-            "english"
-        )
-
-    ]
-
-    for row in range(
-        0,
-        len(games),
-        2
-    ):
-
-        cols = st.columns(2)
-
-        for i, col in enumerate(cols):
-
-            index = row + i
-
-            if index >= len(games):
-                break
-
-            icon, name, description, game_id = games[index]
-
-            with col:
-
-                st.markdown(
-                    f"""
-                    <div class="game-card">
-
-                        <div style="font-size:45px;">
-                        {icon}
-                        </div>
-
-                        <div class="game-title">
-                        {name}
-                        </div>
-
-                        <div class="game-description">
-                        {description}
-                        </div>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-                if st.button(
-                    f"PLAY {name}",
-                    key=f"play_{game_id}",
-                    use_container_width=True
-                ):
-
-                    st.session_state.game = game_id
-
-                    st.session_state.current_question = random.choice(
-                        QUESTIONS[game_id]
-                    )
-
-                    st.session_state.page = "game"
-
-                    st.rerun()
 
 
 # ============================================================
@@ -1184,23 +737,13 @@ QUESTIONS = {
 
         (
             "Which gas do plants mainly take in during photosynthesis?",
-            [
-                "Oxygen",
-                "Carbon dioxide",
-                "Nitrogen",
-                "Hydrogen"
-            ],
+            ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
             "Carbon dioxide"
         ),
 
         (
             "What is the boiling point of water at sea level?",
-            [
-                "50°C",
-                "75°C",
-                "100°C",
-                "150°C"
-            ],
+            ["50°C", "75°C", "100°C", "150°C"],
             "100°C"
         )
 
@@ -1210,23 +753,13 @@ QUESTIONS = {
 
         (
             "Which is a major landform of India?",
-            [
-                "Mountains",
-                "Moon",
-                "Asteroid",
-                "Comet"
-            ],
+            ["Mountains", "Moon", "Asteroid", "Comet"],
             "Mountains"
         ),
 
         (
             "Which institution makes laws in a democracy?",
-            [
-                "Legislature",
-                "Hospital",
-                "Museum",
-                "Bank"
-            ],
+            ["Legislature", "Hospital", "Museum", "Bank"],
             "Legislature"
         )
 
@@ -1236,23 +769,13 @@ QUESTIONS = {
 
         (
             "‘दिन’ का विलोम शब्द क्या है?",
-            [
-                "सुबह",
-                "रात",
-                "दोपहर",
-                "समय"
-            ],
+            ["सुबह", "रात", "दोपहर", "समय"],
             "रात"
         ),
 
         (
             "‘जल’ का पर्यायवाची शब्द क्या है?",
-            [
-                "आकाश",
-                "पानी",
-                "अग्नि",
-                "वायु"
-            ],
+            ["आकाश", "पानी", "अग्नि", "वायु"],
             "पानी"
         )
 
@@ -1262,23 +785,13 @@ QUESTIONS = {
 
         (
             "Choose the correct plural of 'child'.",
-            [
-                "Childs",
-                "Children",
-                "Childes",
-                "Childrens"
-            ],
+            ["Childs", "Children", "Childes", "Childrens"],
             "Children"
         ),
 
         (
             "Which word is an adjective?",
-            [
-                "Run",
-                "Beautiful",
-                "Quickly",
-                "Jump"
-            ],
+            ["Run", "Beautiful", "Quickly", "Jump"],
             "Beautiful"
         )
 
@@ -1286,6 +799,105 @@ QUESTIONS = {
 
 }
 
+
+# ============================================================
+# STUDY PAGE
+# ============================================================
+
+def study_page():
+
+    show_title()
+
+    st.markdown(
+        """<div class="section-title">📚 STUDY ARENA</div>""",
+        unsafe_allow_html=True
+    )
+
+    st.write("Choose your learning game.")
+
+    games = [
+
+        (
+            "➗",
+            "MATH MAZE",
+            "Solve maths questions to escape the maze.",
+            "math"
+        ),
+
+        (
+            "🔬",
+            "SCIENCE LAB",
+            "Experiment, think and solve.",
+            "science"
+        ),
+
+        (
+            "⚔️",
+            "SST CHRONICLES",
+            "History, geography and civics.",
+            "sst"
+        ),
+
+        (
+            "🇮🇳",
+            "HINDI HUNT",
+            "Grammar and vocabulary.",
+            "hindi"
+        ),
+
+        (
+            "🇬🇧",
+            "WORD BATTLE",
+            "Battle your way through English.",
+            "english"
+        )
+
+    ]
+
+    for row in range(0, len(games), 2):
+
+        cols = st.columns(2)
+
+        for i, col in enumerate(cols):
+
+            index = row + i
+
+            if index >= len(games):
+                break
+
+            icon, name, description, game_id = games[index]
+
+            with col:
+
+                st.markdown(
+                    f"""<div class="game-card">
+<div style="font-size:45px;">{icon}</div>
+<div class="game-title">{name}</div>
+<div class="game-description">{description}</div>
+</div>""",
+                    unsafe_allow_html=True
+                )
+
+                if st.button(
+                    f"PLAY {name}",
+                    key=f"play_{game_id}",
+                    use_container_width=True
+                ):
+
+                    st.session_state.game = game_id
+
+                    st.session_state.current_question = random.choice(
+                        QUESTIONS[game_id]
+                    )
+
+                    st.session_state.page = "game"
+
+                    st.rerun()
+
+
+# ============================================================
+# GAME NAMES
+# ============================================================
 
 GAME_NAMES = {
 
@@ -1303,7 +915,7 @@ GAME_NAMES = {
 
 
 # ============================================================
-# GAME
+# GAME PAGE
 # ============================================================
 
 def game_page():
@@ -1313,11 +925,7 @@ def game_page():
     game = st.session_state.game
 
     st.markdown(
-        f"""
-        <div class="section-title">
-        {GAME_NAMES[game]}
-        </div>
-        """,
+        f"""<div class="section-title">{GAME_NAMES[game]}</div>""",
         unsafe_allow_html=True
     )
 
@@ -1326,15 +934,9 @@ def game_page():
     )
 
     st.markdown(
-        f"""
-        <div class="card">
-
-        <h2>
-        {question}
-        </h2>
-
-        </div>
-        """,
+        f"""<div class="card">
+<h2>{question}</h2>
+</div>""",
         unsafe_allow_html=True
     )
 
@@ -1348,13 +950,13 @@ def game_page():
 
             if option == answer:
 
-                st.success(
-                    "✅ CORRECT!  +50 XP  +5 AURA"
+                add_rewards(
+                    xp=50,
+                    aura=5
                 )
 
-                add_rewards(
-                    50,
-                    5
+                st.success(
+                    "✅ CORRECT! +50 XP • +5 AURA"
                 )
 
                 st.session_state.current_question = random.choice(
@@ -1366,7 +968,7 @@ def game_page():
             else:
 
                 st.error(
-                    f"❌ Wrong! Correct answer: {answer}"
+                    f"❌ Wrong! The correct answer is: {answer}"
                 )
 
     st.write("")
@@ -1377,7 +979,6 @@ def game_page():
     ):
 
         st.session_state.current_question = None
-
         st.session_state.page = "study"
 
         st.rerun()
@@ -1392,9 +993,7 @@ def challenges_page():
     show_title()
 
     st.markdown(
-        '<div class="section-title">'
-        '⚔️ DAILY CHALLENGES'
-        '</div>',
+        """<div class="section-title">⚔️ DAILY CHALLENGES</div>""",
         unsafe_allow_html=True
     )
 
@@ -1431,25 +1030,11 @@ def challenges_page():
     ) in enumerate(challenges):
 
         st.markdown(
-            f"""
-            <div class="card">
-
-            <h3>
-            {name}
-            </h3>
-
-            <p>
-            {description}
-            </p>
-
-            <b>
-            ⭐ +{xp} XP
-            &nbsp;&nbsp;
-            ✨ +{aura} Aura
-            </b>
-
-            </div>
-            """,
+            f"""<div class="card">
+<h3>{name}</h3>
+<p>{description}</p>
+<b>⭐ +{xp} XP &nbsp;&nbsp; ✨ +{aura} Aura</b>
+</div>""",
             unsafe_allow_html=True
         )
 
@@ -1467,8 +1052,7 @@ def challenges_page():
             )
 
             st.success(
-                f"🔥 Challenge completed! "
-                f"+{xp} XP and +{aura} Aura!"
+                f"🔥 Challenge completed! +{xp} XP and +{aura} Aura!"
             )
 
 
@@ -1481,45 +1065,20 @@ def profile_page():
     show_title()
 
     st.markdown(
-        '<div class="section-title">'
-        '👤 YOUR PROFILE'
-        '</div>',
+        """<div class="section-title">👤 YOUR PROFILE</div>""",
         unsafe_allow_html=True
     )
 
     st.markdown(
-        f"""
-        <div class="card">
-
-        <h2>
-        👤 {player['name']}
-        </h2>
-
-        <p>
-        🎓 Grade {player['grade']}
-        </p>
-
-        <hr>
-
-        <p>
-        🏆 Level: {player['level']}
-        </p>
-
-        <p>
-        ⭐ XP: {player['xp']}
-        </p>
-
-        <p>
-        ✨ Aura: {player['aura']}
-        </p>
-
-        <p>
-        ⚔️ Challenges Completed:
-        {player['challenges_completed']}
-        </p>
-
-        </div>
-        """,
+        f"""<div class="card">
+<h2>👤 {player['name']}</h2>
+<p>🎓 Grade {player['grade']}</p>
+<hr>
+<p>🏆 Level: {player['level']}</p>
+<p>⭐ XP: {player['xp']}</p>
+<p>✨ Aura: {player['aura']}</p>
+<p>⚔️ Challenges Completed: {player['challenges_completed']}</p>
+</div>""",
         unsafe_allow_html=True
     )
 
@@ -1533,31 +1092,16 @@ def ranks_page():
     show_title()
 
     st.markdown(
-        '<div class="section-title">'
-        '🏆 RANKS'
-        '</div>',
+        """<div class="section-title">🏆 RANKS</div>""",
         unsafe_allow_html=True
     )
 
     st.markdown(
-        f"""
-        <div class="card"
-             style="text-align:center;">
-
-        <h1>
-        🏆 LEVEL {player['level']}
-        </h1>
-
-        <h2>
-        ⭐ {player['xp']} XP
-        </h2>
-
-        <h2>
-        ✨ {player['aura']} AURA
-        </h2>
-
-        </div>
-        """,
+        f"""<div class="card" style="text-align:center;">
+<h1>🏆 LEVEL {player['level']}</h1>
+<h2>⭐ {player['xp']} XP</h2>
+<h2>✨ {player['aura']} AURA</h2>
+</div>""",
         unsafe_allow_html=True
     )
 
@@ -1575,9 +1119,7 @@ def chill_page():
     show_title()
 
     st.markdown(
-        '<div class="section-title">'
-        '🌙 CHILL ZONE'
-        '</div>',
+        """<div class="section-title">🌙 CHILL ZONE</div>""",
         unsafe_allow_html=True
     )
 
@@ -1591,26 +1133,15 @@ def chill_page():
 
         "One challenge at a time. ⚔️",
 
-        "You don't have to be perfect. "
-        "Just keep learning. ✨"
+        "You don't have to be perfect. Just keep learning. ✨"
 
     ]
 
     st.markdown(
-        f"""
-        <div class="card"
-             style="text-align:center;">
-
-        <div style="font-size:75px;">
-        🌌
-        </div>
-
-        <h2>
-        {random.choice(quotes)}
-        </h2>
-
-        </div>
-        """,
+        f"""<div class="card" style="text-align:center;">
+<div style="font-size:75px;">🌌</div>
+<h2>{random.choice(quotes)}</h2>
+</div>""",
         unsafe_allow_html=True
     )
 
