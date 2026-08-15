@@ -5,132 +5,24 @@ import random
 
 # ============================================================
 # ARENA OF MINDS
-# Streamlit Version 1
 # ============================================================
 
 SAVE_FILE = "arena_of_minds_data.json"
-
+BACKGROUND_IMAGE = "anime_background.jpg"
 
 # ============================================================
-# PAGE SETTINGS
+# PAGE CONFIG
 # ============================================================
 
 st.set_page_config(
     page_title="Arena of Minds",
     page_icon="⚔️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-
 # ============================================================
-# COLORS / DESIGN
-# ============================================================
-
-st.markdown("""
-<style>
-
-.stApp {
-    background:
-        radial-gradient(circle at top, #252044 0%, #0b0b16 45%, #05050b 100%);
-    color: white;
-}
-
-/* Main heading */
-.aom-title {
-    text-align: center;
-    font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
-    font-size: 55px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    padding: 20px 0 5px 0;
-    text-shadow:
-        4px 4px 0px #5d2fa3,
-        0px 0px 18px #b98cff;
-}
-
-/* Subtitle */
-.aom-subtitle {
-    text-align: center;
-    font-size: 15px;
-    letter-spacing: 5px;
-    color: #aaaac7;
-    margin-bottom: 30px;
-}
-
-/* Cards */
-.card {
-    background: rgba(25, 25, 45, 0.92);
-    border: 1px solid #39395c;
-    border-radius: 20px;
-    padding: 25px;
-    margin: 10px 0;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-}
-
-/* Stat cards */
-.stat {
-    background: linear-gradient(145deg, #19192f, #252541);
-    border: 1px solid #414166;
-    border-radius: 18px;
-    padding: 20px;
-    text-align: center;
-}
-
-.stat-title {
-    color: #aaaac7;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.stat-value {
-    font-size: 30px;
-    font-weight: 900;
-}
-
-/* Game cards */
-.game-card {
-    background: linear-gradient(145deg, #17172c, #262643);
-    border: 1px solid #42426b;
-    border-radius: 22px;
-    padding: 25px;
-    text-align: center;
-    min-height: 150px;
-}
-
-.game-title {
-    font-size: 22px;
-    font-weight: 900;
-}
-
-.game-description {
-    color: #b7b7cc;
-    font-size: 13px;
-}
-
-/* Section headings */
-.section-title {
-    font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
-    font-size: 32px;
-    font-weight: 900;
-    text-align: center;
-    margin: 20px 0;
-}
-
-/* Hide Streamlit menu */
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# ============================================================
-# SAVE / LOAD
+# DATA
 # ============================================================
 
 DEFAULT_DATA = {
@@ -144,13 +36,10 @@ DEFAULT_DATA = {
 
 
 def load_data():
-
     if os.path.exists(SAVE_FILE):
-
         try:
             with open(SAVE_FILE, "r") as file:
                 return json.load(file)
-
         except:
             return DEFAULT_DATA.copy()
 
@@ -158,20 +47,21 @@ def load_data():
 
 
 def save_data():
-
     with open(SAVE_FILE, "w") as file:
         json.dump(st.session_state.player, file, indent=4)
 
-
-# ============================================================
-# SESSION STATE
-# ============================================================
 
 if "player" not in st.session_state:
     st.session_state.player = load_data()
 
 if "page" not in st.session_state:
     st.session_state.page = "home"
+
+if "game" not in st.session_state:
+    st.session_state.game = None
+
+if "current_question" not in st.session_state:
+    st.session_state.current_question = None
 
 
 player = st.session_state.player
@@ -182,7 +72,6 @@ player = st.session_state.player
 # ============================================================
 
 def xp_needed():
-
     return player["level"] * 100
 
 
@@ -194,7 +83,6 @@ def add_rewards(xp=0, aura=0):
     leveled_up = False
 
     while player["xp"] >= xp_needed():
-
         player["xp"] -= xp_needed()
         player["level"] += 1
         leveled_up = True
@@ -202,19 +90,438 @@ def add_rewards(xp=0, aura=0):
     save_data()
 
     if leveled_up:
-
         st.balloons()
-
         st.success(
             f"🔥 LEVEL UP! You reached Level {player['level']}!"
         )
 
 
 # ============================================================
+# CUSTOM CSS
+# ============================================================
+
+if os.path.exists(BACKGROUND_IMAGE):
+
+    import base64
+
+    with open(BACKGROUND_IMAGE, "rb") as image_file:
+        encoded_image = base64.b64encode(
+            image_file.read()
+        ).decode()
+
+    background = f"""
+    data:image/jpeg;base64,{encoded_image}
+    """
+
+else:
+
+    background = ""
+
+
+st.markdown(
+    f"""
+<style>
+
+/* ==========================================================
+   MAIN APP
+   ========================================================== */
+
+.stApp {{
+
+    background:
+        linear-gradient(
+            rgba(5, 5, 15, 0.45),
+            rgba(5, 5, 15, 0.80)
+        ),
+        url("{background}");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    color: white;
+}}
+
+
+/* ==========================================================
+   MAIN CONTENT
+   ========================================================== */
+
+.block-container {{
+
+    max-width: 1250px;
+
+    padding-top: 25px;
+    padding-bottom: 50px;
+
+    background: rgba(5, 5, 15, 0.25);
+
+    border-radius: 30px;
+}}
+
+
+/* ==========================================================
+   BOUNCY TITLE
+   ========================================================== */
+
+.aom-title {{
+
+    text-align: center;
+
+    font-family:
+        "Comic Sans MS",
+        "Trebuchet MS",
+        sans-serif;
+
+    font-size: 58px;
+
+    font-weight: 900;
+
+    letter-spacing: 4px;
+
+    color: white;
+
+    text-shadow:
+
+        4px 4px 0px #5b2b91,
+
+        0px 0px 10px #b98cff,
+
+        0px 0px 25px #7c4dff;
+
+    animation: titleBounce 2.2s infinite;
+
+    margin-bottom: 5px;
+}}
+
+
+@keyframes titleBounce {{
+
+    0%, 100% {{
+        transform:
+            translateY(0px)
+            rotate(-1deg);
+    }}
+
+    50% {{
+        transform:
+            translateY(-8px)
+            rotate(1deg);
+    }}
+}}
+
+
+/* ==========================================================
+   SUBTITLE
+   ========================================================== */
+
+.aom-subtitle {{
+
+    text-align: center;
+
+    color: #c1bdd7;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    letter-spacing: 6px;
+
+    margin-bottom: 30px;
+}}
+
+
+/* ==========================================================
+   SECTION TITLE
+   ========================================================== */
+
+.section-title {{
+
+    text-align: center;
+
+    font-family:
+        "Comic Sans MS",
+        "Trebuchet MS",
+        sans-serif;
+
+    font-size: 32px;
+
+    font-weight: 900;
+
+    color: white;
+
+    text-shadow:
+        2px 2px 0px #54258a,
+        0px 0px 12px #9c6cff;
+
+    margin: 20px 0;
+}}
+
+
+/* ==========================================================
+   CARDS
+   ========================================================== */
+
+.card {{
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(24, 23, 48, 0.94),
+            rgba(38, 35, 67, 0.94)
+        );
+
+    border:
+
+        1px solid
+        rgba(166, 137, 255, 0.35);
+
+    border-radius: 22px;
+
+    padding: 25px;
+
+    margin: 10px 0;
+
+    box-shadow:
+        0px 10px 35px rgba(0,0,0,0.45);
+
+}}
+
+
+/* ==========================================================
+   STAT CARDS
+   ========================================================== */
+
+.stat {{
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,20,40,0.95),
+            rgba(40,38,70,0.95)
+        );
+
+    border:
+        1px solid
+        rgba(160,130,255,0.35);
+
+    border-radius: 20px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0px 8px 25px rgba(0,0,0,0.4);
+}}
+
+
+.stat-title {{
+
+    color: #aaa8c0;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}}
+
+
+.stat-value {{
+
+    font-size: 32px;
+
+    font-weight: 900;
+
+    color: white;
+}}
+
+
+/* ==========================================================
+   GAME CARDS
+   ========================================================== */
+
+.game-card {{
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,20,42,0.95),
+            rgba(42,38,72,0.95)
+        );
+
+    border:
+        1px solid
+        rgba(164,130,255,0.35);
+
+    border-radius: 24px;
+
+    padding: 28px;
+
+    text-align: center;
+
+    min-height: 160px;
+
+    box-shadow:
+        0px 10px 30px rgba(0,0,0,0.4);
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}}
+
+
+.game-card:hover {{
+
+    transform:
+        translateY(-6px)
+        scale(1.01);
+
+    box-shadow:
+        0px 15px 40px
+        rgba(120,70,220,0.35);
+}}
+
+
+.game-title {{
+
+    font-size: 22px;
+
+    font-weight: 900;
+
+    color: white;
+}}
+
+
+.game-description {{
+
+    color: #bcb9d0;
+
+    font-size: 13px;
+
+    margin-top: 8px;
+}}
+
+
+/* ==========================================================
+   STREAMLIT BUTTONS
+   ========================================================== */
+
+.stButton > button {{
+
+    border-radius: 14px;
+
+    border:
+        1px solid
+        rgba(170,140,255,0.4);
+
+    background:
+        linear-gradient(
+            135deg,
+            #33205f,
+            #542d82
+        );
+
+    color: white;
+
+    font-weight: 800;
+
+    min-height: 45px;
+
+    transition:
+        transform 0.15s,
+        box-shadow 0.15s;
+}}
+
+
+.stButton > button:hover {{
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0px 8px 20px
+        rgba(130,80,220,0.4);
+
+    border-color:
+        #b98cff;
+}}
+
+
+/* ==========================================================
+   INPUT BOXES
+   ========================================================== */
+
+.stTextInput input {{
+
+    background:
+        rgba(20,20,38,0.9);
+
+    color: white;
+
+    border:
+        1px solid #514b75;
+
+    border-radius: 12px;
+}}
+
+
+/* ==========================================================
+   SIDEBAR
+   ========================================================== */
+
+section[data-testid="stSidebar"] {{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(10,9,25,0.98),
+            rgba(20,15,38,0.98)
+        );
+
+    border-right:
+        1px solid
+        rgba(150,120,255,0.25);
+}}
+
+
+/* ==========================================================
+   PROGRESS BAR
+   ========================================================== */
+
+.stProgress > div > div > div > div {{
+
+    background:
+        linear-gradient(
+            90deg,
+            #6636bd,
+            #b98cff
+        );
+}}
+
+
+/* ==========================================================
+   HIDE STREAMLIT DEFAULTS
+   ========================================================== */
+
+#MainMenu {{
+    visibility: hidden;
+}}
+
+footer {{
+    visibility: hidden;
+}}
+
+</style>
+""",
+    unsafe_allow_html=True
+)
+
+
+# ============================================================
 # TITLE
 # ============================================================
 
-def title():
+def show_title():
 
     st.markdown(
         '<div class="aom-title">⚔️ ARENA OF MINDS ⚔️</div>',
@@ -222,30 +529,40 @@ def title():
     )
 
     st.markdown(
-        '<div class="aom-subtitle">LEARN • CHALLENGE • CONQUER</div>',
+        '<div class="aom-subtitle">'
+        'LEARN • CHALLENGE • CONQUER'
+        '</div>',
         unsafe_allow_html=True
     )
 
 
 # ============================================================
-# SETUP PAGE
+# FIRST TIME SETUP
 # ============================================================
 
 def setup_page():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">WELCOME, FUTURE CHAMPION</div>',
+        '<div class="section-title">'
+        'WELCOME, FUTURE CHAMPION'
+        '</div>',
         unsafe_allow_html=True
     )
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    left, center, right = st.columns([1, 2, 1])
 
-    with col2:
+    with center:
 
         st.markdown(
-            '<div class="card">',
+            """
+            <div class="card">
+            <h2 style="text-align:center;">
+            🌙 ENTER THE ARENA 🌙
+            </h2>
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
@@ -257,18 +574,22 @@ def setup_page():
             "🎓 What's your grade?"
         )
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
         if st.button(
             "⚔️ START YOUR JOURNEY",
             use_container_width=True
         ):
 
-            if name.strip() == "":
-                st.warning("Please enter your name.")
+            if not name.strip():
 
-            elif grade.strip() == "":
-                st.warning("Please enter your grade.")
+                st.warning(
+                    "Please enter your name."
+                )
+
+            elif not grade.strip():
+
+                st.warning(
+                    "Please enter your grade."
+                )
 
             else:
 
@@ -290,46 +611,89 @@ def setup_page():
 # SIDEBAR
 # ============================================================
 
-def sidebar():
+def show_sidebar():
 
     with st.sidebar:
 
         st.markdown(
-            "## ⚔️ ARENA OF MINDS"
+            """
+            <div style="
+                text-align:center;
+                font-size:25px;
+                font-weight:900;
+            ">
+            ⚔️ ARENA
+            </div>
+            """,
+            unsafe_allow_html=True
         )
+
+        st.write("")
 
         st.markdown(
             f"### 👤 {player['name']}"
         )
 
-        st.markdown(
+        st.caption(
             f"🎓 Grade {player['grade']}"
         )
 
         st.divider()
 
-        if st.button("🏠 Home", use_container_width=True):
+        if st.button(
+            "🏠 HOME",
+            use_container_width=True
+        ):
             st.session_state.page = "home"
+            st.rerun()
 
-        if st.button("📚 Study", use_container_width=True):
+        if st.button(
+            "📚 STUDY",
+            use_container_width=True
+        ):
             st.session_state.page = "study"
+            st.rerun()
 
-        if st.button("⚔️ Challenges", use_container_width=True):
+        if st.button(
+            "⚔️ CHALLENGES",
+            use_container_width=True
+        ):
             st.session_state.page = "challenges"
+            st.rerun()
 
-        if st.button("🏆 Ranks", use_container_width=True):
+        if st.button(
+            "🏆 RANKS",
+            use_container_width=True
+        ):
             st.session_state.page = "ranks"
+            st.rerun()
 
-        if st.button("👤 Profile", use_container_width=True):
+        if st.button(
+            "👤 PROFILE",
+            use_container_width=True
+        ):
             st.session_state.page = "profile"
+            st.rerun()
 
-        if st.button("🌙 Chill", use_container_width=True):
+        if st.button(
+            "🌙 CHILL",
+            use_container_width=True
+        ):
             st.session_state.page = "chill"
+            st.rerun()
 
         st.divider()
 
         st.caption(
-            "⭐ XP  •  ✨ Aura  •  🏆 Levels"
+            f"⭐ XP: {player['xp']}"
+        )
+
+        st.caption(
+            f"✨ Aura: {player['aura']}"
+        )
+
+        st.caption(
+            f"🏆 Level: {player['level']}"
         )
 
 
@@ -339,50 +703,69 @@ def sidebar():
 
 def home_page():
 
-    title()
+    show_title()
 
     st.markdown(
         f"""
         <div class="card">
-        <h2>Welcome, {player['name']}! 👋</h2>
-        <p>Grade {player['grade']} • Your journey continues...</p>
+            <h2>Welcome, {player['name']}! 👋</h2>
+            <p>
+            🎓 Grade {player['grade']}
+            &nbsp; • &nbsp;
+            🏆 Level {player['level']}
+            </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # Stats
+    st.write("")
 
     c1, c2, c3 = st.columns(3)
 
     with c1:
+
         st.markdown(
             f"""
             <div class="stat">
-            <div class="stat-title">⭐ XP</div>
-            <div class="stat-value">{player['xp']}</div>
+                <div class="stat-title">
+                    ⭐ XP
+                </div>
+                <div class="stat-value">
+                    {player['xp']}
+                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with c2:
+
         st.markdown(
             f"""
             <div class="stat">
-            <div class="stat-title">✨ AURA</div>
-            <div class="stat-value">{player['aura']}</div>
+                <div class="stat-title">
+                    ✨ AURA
+                </div>
+                <div class="stat-value">
+                    {player['aura']}
+                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with c3:
+
         st.markdown(
             f"""
             <div class="stat">
-            <div class="stat-title">🏆 LEVEL</div>
-            <div class="stat-value">{player['level']}</div>
+                <div class="stat-title">
+                    🏆 LEVEL
+                </div>
+                <div class="stat-value">
+                    {player['level']}
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -390,22 +773,29 @@ def home_page():
 
     st.write("")
 
-    # XP progress
-
     required = xp_needed()
 
     progress = player["xp"] / required
 
-    st.write(
-        f"**Level {player['level']} Progress — {player['xp']} / {required} XP**"
+    st.markdown(
+        f"""
+        <div class="card">
+        <b>
+        🏆 LEVEL {player['level']} PROGRESS
+        </b>
+        <br><br>
+        ⭐ {player['xp']} / {required} XP
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
     st.progress(progress)
 
-    st.write("")
-
     st.markdown(
-        '<div class="section-title">🔥 ENTER THE ARENA</div>',
+        '<div class="section-title">'
+        '🔥 ENTER THE ARENA'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -416,10 +806,13 @@ def home_page():
         st.markdown(
             """
             <div class="game-card">
-            <div class="game-title">📚 STUDY</div>
-            <div class="game-description">
-            Turn studying into games.
-            </div>
+                <div style="font-size:45px;">📚</div>
+                <div class="game-title">
+                    STUDY
+                </div>
+                <div class="game-description">
+                    Turn learning into games.
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -438,10 +831,13 @@ def home_page():
         st.markdown(
             """
             <div class="game-card">
-            <div class="game-title">⚔️ CHALLENGES</div>
-            <div class="game-description">
-            Complete challenges and earn rewards.
-            </div>
+                <div style="font-size:45px;">⚔️</div>
+                <div class="game-title">
+                    CHALLENGES
+                </div>
+                <div class="game-description">
+                    Complete challenges and earn rewards.
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -460,10 +856,13 @@ def home_page():
         st.markdown(
             """
             <div class="game-card">
-            <div class="game-title">🌙 CHILL</div>
-            <div class="game-description">
-            Take a break and relax.
-            </div>
+                <div style="font-size:45px;">🌙</div>
+                <div class="game-title">
+                    CHILL
+                </div>
+                <div class="game-description">
+                    Take a break from the arena.
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -479,53 +878,61 @@ def home_page():
 
 
 # ============================================================
-# STUDY PAGE
+# STUDY ARENA
 # ============================================================
 
 def study_page():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">📚 STUDY ARENA</div>',
+        '<div class="section-title">'
+        '📚 STUDY ARENA'
+        '</div>',
         unsafe_allow_html=True
     )
 
     st.write(
-        "Choose a game and turn learning into an adventure."
+        "Choose your learning game."
     )
 
     games = [
+
         (
             "➗",
             "MATH MAZE",
             "Solve maths questions to escape the maze.",
             "math"
         ),
+
         (
             "🔬",
             "SCIENCE LAB",
             "Experiment, think and solve.",
             "science"
         ),
+
         (
             "⚔️",
             "SST CHRONICLES",
-            "History, geography and civics.",
+            "Travel through history, geography and civics.",
             "sst"
         ),
+
         (
             "🇮🇳",
             "HINDI HUNT",
             "Grammar, vocabulary and Hindi challenges.",
             "hindi"
         ),
+
         (
             "🇬🇧",
             "WORD BATTLE",
             "Battle your way through English.",
             "english"
         )
+
     ]
 
     for row in range(0, len(games), 2):
@@ -546,11 +953,17 @@ def study_page():
                 st.markdown(
                     f"""
                     <div class="game-card">
-                    <div style="font-size:40px">{icon}</div>
-                    <div class="game-title">{name}</div>
-                    <div class="game-description">
-                    {description}
-                    </div>
+                        <div style="font-size:45px;">
+                        {icon}
+                        </div>
+
+                        <div class="game-title">
+                        {name}
+                        </div>
+
+                        <div class="game-description">
+                        {description}
+                        </div>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -558,18 +971,23 @@ def study_page():
 
                 if st.button(
                     f"PLAY {name}",
-                    key=f"game_{game_id}",
+                    key=f"play_{game_id}",
                     use_container_width=True
                 ):
 
                     st.session_state.game = game_id
+
+                    st.session_state.current_question = random.choice(
+                        QUESTIONS[game_id]
+                    )
+
                     st.session_state.page = "game"
 
                     st.rerun()
 
 
 # ============================================================
-# GAME DATA
+# QUESTIONS
 # ============================================================
 
 QUESTIONS = {
@@ -606,13 +1024,23 @@ QUESTIONS = {
 
         (
             "Which gas do plants mainly take in during photosynthesis?",
-            ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+            [
+                "Oxygen",
+                "Carbon dioxide",
+                "Nitrogen",
+                "Hydrogen"
+            ],
             "Carbon dioxide"
         ),
 
         (
             "What is the boiling point of water at sea level?",
-            ["50°C", "75°C", "100°C", "150°C"],
+            [
+                "50°C",
+                "75°C",
+                "100°C",
+                "150°C"
+            ],
             "100°C"
         )
 
@@ -622,13 +1050,23 @@ QUESTIONS = {
 
         (
             "Which is a major landform of India?",
-            ["Mountains", "Moon", "Asteroid", "Comet"],
+            [
+                "Mountains",
+                "Moon",
+                "Asteroid",
+                "Comet"
+            ],
             "Mountains"
         ),
 
         (
             "Which institution makes laws in a democracy?",
-            ["Legislature", "Hospital", "Museum", "Bank"],
+            [
+                "Legislature",
+                "Hospital",
+                "Museum",
+                "Bank"
+            ],
             "Legislature"
         )
 
@@ -638,13 +1076,23 @@ QUESTIONS = {
 
         (
             "‘दिन’ का विलोम शब्द क्या है?",
-            ["सुबह", "रात", "दोपहर", "समय"],
+            [
+                "सुबह",
+                "रात",
+                "दोपहर",
+                "समय"
+            ],
             "रात"
         ),
 
         (
             "‘जल’ का पर्यायवाची शब्द क्या है?",
-            ["आकाश", "पानी", "अग्नि", "वायु"],
+            [
+                "आकाश",
+                "पानी",
+                "अग्नि",
+                "वायु"
+            ],
             "पानी"
         )
 
@@ -654,13 +1102,23 @@ QUESTIONS = {
 
         (
             "Choose the correct plural of 'child'.",
-            ["Childs", "Children", "Childes", "Childrens"],
+            [
+                "Childs",
+                "Children",
+                "Childes",
+                "Childrens"
+            ],
             "Children"
         ),
 
         (
             "Which word is an adjective?",
-            ["Run", "Beautiful", "Quickly", "Jump"],
+            [
+                "Run",
+                "Beautiful",
+                "Quickly",
+                "Jump"
+            ],
             "Beautiful"
         )
 
@@ -670,11 +1128,17 @@ QUESTIONS = {
 
 
 GAME_NAMES = {
+
     "math": "➗ MATH MAZE",
+
     "science": "🔬 SCIENCE LAB",
+
     "sst": "⚔️ SST CHRONICLES",
+
     "hindi": "🇮🇳 HINDI HUNT",
+
     "english": "🇬🇧 WORD BATTLE"
+
 }
 
 
@@ -684,22 +1148,22 @@ GAME_NAMES = {
 
 def game_page():
 
+    show_title()
+
     game = st.session_state.game
 
-    title()
-
     st.markdown(
-        f'<div class="section-title">{GAME_NAMES[game]}</div>',
+        f"""
+        <div class="section-title">
+        {GAME_NAMES[game]}
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
-    if "current_question" not in st.session_state:
-
-        st.session_state.current_question = random.choice(
-            QUESTIONS[game]
-        )
-
-    question, options, answer = st.session_state.current_question
+    question, options, answer = (
+        st.session_state.current_question
+    )
 
     st.markdown(
         f"""
@@ -710,19 +1174,24 @@ def game_page():
         unsafe_allow_html=True
     )
 
-    for option in options:
+    for i, option in enumerate(options):
 
         if st.button(
             option,
-            key=f"answer_{option}",
+            key=f"answer_{game}_{i}",
             use_container_width=True
         ):
 
             if option == answer:
 
-                st.success("✅ Correct! +50 XP and +5 Aura!")
+                st.success(
+                    "✅ CORRECT!  +50 XP  +5 AURA"
+                )
 
-                add_rewards(50, 5)
+                add_rewards(
+                    xp=50,
+                    aura=5
+                )
 
                 st.session_state.current_question = random.choice(
                     QUESTIONS[game]
@@ -733,15 +1202,18 @@ def game_page():
             else:
 
                 st.error(
-                    f"❌ Not quite! The correct answer was: {answer}"
+                    f"❌ Wrong answer! "
+                    f"The correct answer is: {answer}"
                 )
 
     st.write("")
 
-    if st.button("← Back to Study"):
+    if st.button(
+        "← BACK TO STUDY",
+        use_container_width=True
+    ):
 
-        if "current_question" in st.session_state:
-            del st.session_state.current_question
+        st.session_state.current_question = None
 
         st.session_state.page = "study"
 
@@ -754,40 +1226,61 @@ def game_page():
 
 def challenges_page():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">⚔️ DAILY CHALLENGES</div>',
+        '<div class="section-title">'
+        '⚔️ DAILY CHALLENGES'
+        '</div>',
         unsafe_allow_html=True
     )
 
     challenges = [
 
-        ("⭐ Knowledge Warrior",
-         "Answer a study question.",
-         100,
-         10),
+        (
+            "⭐ KNOWLEDGE WARRIOR",
+            "Answer a study question.",
+            100,
+            10
+        ),
 
-        ("🔥 Arena Explorer",
-         "Play one Study Arena game.",
-         75,
-         5),
+        (
+            "🔥 ARENA EXPLORER",
+            "Complete one study game.",
+            75,
+            5
+        ),
 
-        ("🧠 Brain Master",
-         "Complete a challenge.",
-         125,
-         15)
+        (
+            "🧠 BRAIN MASTER",
+            "Complete a challenge.",
+            125,
+            15
+        )
 
     ]
 
-    for i, (name, description, xp, aura) in enumerate(challenges):
+    for i, (
+        name,
+        description,
+        xp,
+        aura
+    ) in enumerate(challenges):
 
         st.markdown(
             f"""
             <div class="card">
+
             <h3>{name}</h3>
+
             <p>{description}</p>
-            <p>⭐ +{xp} XP &nbsp;&nbsp; ✨ +{aura} Aura</p>
+
+            <b>
+            ⭐ +{xp} XP
+            &nbsp;&nbsp;
+            ✨ +{aura} Aura
+            </b>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -801,10 +1294,14 @@ def challenges_page():
 
             player["challenges_completed"] += 1
 
-            add_rewards(xp, aura)
+            add_rewards(
+                xp,
+                aura
+            )
 
             st.success(
-                f"🔥 Challenge completed! +{xp} XP and +{aura} Aura!"
+                f"🔥 Challenge completed! "
+                f"+{xp} XP and +{aura} Aura!"
             )
 
 
@@ -814,23 +1311,46 @@ def challenges_page():
 
 def profile_page():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">👤 YOUR PROFILE</div>',
+        '<div class="section-title">'
+        '👤 YOUR PROFILE'
+        '</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
         f"""
         <div class="card">
-        <h2>👤 {player['name']}</h2>
-        <p>🎓 Grade {player['grade']}</p>
+
+        <h2>
+        👤 {player['name']}
+        </h2>
+
+        <p>
+        🎓 Grade {player['grade']}
+        </p>
+
         <hr>
-        <p>🏆 Level: {player['level']}</p>
-        <p>⭐ XP: {player['xp']}</p>
-        <p>✨ Aura: {player['aura']}</p>
-        <p>⚔️ Challenges Completed: {player['challenges_completed']}</p>
+
+        <p>
+        🏆 Level: {player['level']}
+        </p>
+
+        <p>
+        ⭐ XP: {player['xp']}
+        </p>
+
+        <p>
+        ✨ Aura: {player['aura']}
+        </p>
+
+        <p>
+        ⚔️ Challenges Completed:
+        {player['challenges_completed']}
+        </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -843,26 +1363,39 @@ def profile_page():
 
 def ranks_page():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">🏆 RANKS</div>',
+        '<div class="section-title">'
+        '🏆 RANKS'
+        '</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
         f"""
-        <div class="card">
-        <h2>🏆 Level {player['level']}</h2>
-        <h3>⭐ {player['xp']} XP</h3>
-        <h3>✨ {player['aura']} Aura</h3>
+        <div class="card"
+             style="text-align:center;">
+
+        <h1>
+        🏆 LEVEL {player['level']}
+        </h1>
+
+        <h2>
+        ⭐ {player['xp']} XP
+        </h2>
+
+        <h2>
+        ✨ {player['aura']} AURA
+        </h2>
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
     st.info(
-        "Online leaderboards can be added later when we connect Arena of Minds to an online database."
+        "🌐 Online leaderboards can be added later."
     )
 
 
@@ -872,10 +1405,12 @@ def ranks_page():
 
 def chill_page():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">🌙 CHILL ZONE</div>',
+        '<div class="section-title">'
+        '🌙 CHILL ZONE'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -889,29 +1424,57 @@ def chill_page():
 
         "One challenge at a time. ⚔️",
 
-        "You don't have to be perfect. Just keep learning. ✨"
+        "You don't have to be perfect. "
+        "Just keep learning. ✨"
 
     ]
 
+    quote = random.choice(quotes)
+
     st.markdown(
         f"""
-        <div class="card" style="text-align:center;">
-        <div style="font-size:70px;">🌌</div>
-        <h2>{random.choice(quotes)}</h2>
+        <div class="card"
+             style="text-align:center;">
+
+        <div style="font-size:75px;">
+        🌌
+        </div>
+
+        <h2>
+        {quote}
+        </h2>
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
     if st.button(
-        "✨ GIVE ME ANOTHER THOUGHT",
+        "✨ ANOTHER THOUGHT",
         use_container_width=True
     ):
+
         st.rerun()
 
 
 # ============================================================
-# PAGE ROUTER
+# RESET PROFILE
+# ============================================================
+
+def reset_profile():
+
+    st.session_state.player = DEFAULT_DATA.copy()
+
+    if os.path.exists(SAVE_FILE):
+        os.remove(SAVE_FILE)
+
+    st.session_state.page = "home"
+
+    st.rerun()
+
+
+# ============================================================
+# APP ROUTER
 # ============================================================
 
 if player["name"] == "":
@@ -920,25 +1483,32 @@ if player["name"] == "":
 
 else:
 
-    sidebar()
+    show_sidebar()
 
     if st.session_state.page == "home":
+
         home_page()
 
     elif st.session_state.page == "study":
+
         study_page()
 
     elif st.session_state.page == "game":
+
         game_page()
 
     elif st.session_state.page == "challenges":
+
         challenges_page()
 
     elif st.session_state.page == "profile":
+
         profile_page()
 
     elif st.session_state.page == "ranks":
+
         ranks_page()
 
     elif st.session_state.page == "chill":
+
         chill_page()
