@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import os
 import random
+import base64
 
 # ============================================================
 # ARENA OF MINDS
@@ -10,15 +11,10 @@ import random
 SAVE_FILE = "arena_of_minds_data.json"
 BACKGROUND_IMAGE = "anime_background.jpg"
 
-# ============================================================
-# PAGE CONFIG
-# ============================================================
-
 st.set_page_config(
     page_title="Arena of Minds",
     page_icon="⚔️",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 # ============================================================
@@ -63,7 +59,6 @@ if "game" not in st.session_state:
 if "current_question" not in st.session_state:
     st.session_state.current_question = None
 
-
 player = st.session_state.player
 
 
@@ -83,6 +78,7 @@ def add_rewards(xp=0, aura=0):
     leveled_up = False
 
     while player["xp"] >= xp_needed():
+
         player["xp"] -= xp_needed()
         player["level"] += 1
         leveled_up = True
@@ -90,79 +86,149 @@ def add_rewards(xp=0, aura=0):
     save_data()
 
     if leveled_up:
+
         st.balloons()
+
         st.success(
             f"🔥 LEVEL UP! You reached Level {player['level']}!"
         )
 
 
 # ============================================================
-# CUSTOM CSS
+# BACKGROUND
 # ============================================================
 
-if os.path.exists(BACKGROUND_IMAGE):
+def get_background():
 
-    import base64
+    if os.path.exists(BACKGROUND_IMAGE):
 
-    with open(BACKGROUND_IMAGE, "rb") as image_file:
-        encoded_image = base64.b64encode(
-            image_file.read()
-        ).decode()
+        try:
 
-    background = f"""
-    data:image/jpeg;base64,{encoded_image}
+            with open(
+                BACKGROUND_IMAGE,
+                "rb"
+            ) as image_file:
+
+                encoded = base64.b64encode(
+                    image_file.read()
+                ).decode()
+
+            return f"data:image/jpeg;base64,{encoded}"
+
+        except:
+            return ""
+
+    return ""
+
+
+background = get_background()
+
+
+# ============================================================
+# CSS
+# ============================================================
+
+if background:
+
+    background_css = f"""
+    background-image:
+        linear-gradient(
+            rgba(8, 30, 75, 0.35),
+            rgba(3, 18, 55, 0.75)
+        ),
+        url("{background}");
     """
 
 else:
 
-    background = ""
+    background_css = """
+    background-image:
+        radial-gradient(
+            circle at 50% 10%,
+            #164c91 0%,
+            #0b2e63 30%,
+            #061a3b 65%,
+            #031027 100%
+        );
+    """
 
 
 st.markdown(
     f"""
 <style>
 
-/* ==========================================================
-   MAIN APP
-   ========================================================== */
+/* ============================================================
+   MAIN BACKGROUND
+   ============================================================ */
 
 .stApp {{
 
-    background:
-        linear-gradient(
-            rgba(5, 5, 15, 0.45),
-            rgba(5, 5, 15, 0.80)
-        ),
-        url("{background}");
+    {background_css}
 
     background-size: cover;
+
     background-position: center;
+
     background-attachment: fixed;
 
     color: white;
+
+    min-height: 100vh;
 }}
 
 
-/* ==========================================================
-   MAIN CONTENT
-   ========================================================== */
+/* ============================================================
+   BLUE ATMOSPHERIC OVERLAY
+   ============================================================ */
+
+.stApp::before {{
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(30,120,255,0.18),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(0,170,255,0.15),
+            transparent 30%
+        );
+
+    z-index: 0;
+}}
+
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
 
 .block-container {{
+
+    position: relative;
+
+    z-index: 1;
 
     max-width: 1250px;
 
     padding-top: 25px;
+
     padding-bottom: 50px;
-
-    background: rgba(5, 5, 15, 0.25);
-
-    border-radius: 30px;
 }}
 
 
-/* ==========================================================
+/* ============================================================
    BOUNCY TITLE
-   ========================================================== */
+   ============================================================ */
 
 .aom-title {{
 
@@ -173,29 +239,29 @@ st.markdown(
         "Trebuchet MS",
         sans-serif;
 
-    font-size: 58px;
+    font-size: 60px;
 
     font-weight: 900;
 
     letter-spacing: 4px;
 
-    color: white;
+    color: #ffffff;
 
     text-shadow:
 
-        4px 4px 0px #5b2b91,
+        4px 4px 0px #0755b8,
 
-        0px 0px 10px #b98cff,
+        0px 0px 12px #39a9ff,
 
-        0px 0px 25px #7c4dff;
+        0px 0px 30px #0077ff;
 
-    animation: titleBounce 2.2s infinite;
+    animation: bounceTitle 2s infinite;
 
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }}
 
 
-@keyframes titleBounce {{
+@keyframes bounceTitle {{
 
     0%, 100% {{
         transform:
@@ -208,18 +274,19 @@ st.markdown(
             translateY(-8px)
             rotate(1deg);
     }}
+
 }}
 
 
-/* ==========================================================
+/* ============================================================
    SUBTITLE
-   ========================================================== */
+   ============================================================ */
 
 .aom-subtitle {{
 
     text-align: center;
 
-    color: #c1bdd7;
+    color: #b9ddff;
 
     font-size: 14px;
 
@@ -231,9 +298,9 @@ st.markdown(
 }}
 
 
-/* ==========================================================
+/* ============================================================
    SECTION TITLE
-   ========================================================== */
+   ============================================================ */
 
 .section-title {{
 
@@ -244,37 +311,39 @@ st.markdown(
         "Trebuchet MS",
         sans-serif;
 
-    font-size: 32px;
+    font-size: 34px;
 
     font-weight: 900;
 
     color: white;
 
     text-shadow:
-        2px 2px 0px #54258a,
-        0px 0px 12px #9c6cff;
 
-    margin: 20px 0;
+        3px 3px 0px #0755b8,
+
+        0px 0px 15px #1e9bff;
+
+    margin: 25px 0;
 }}
 
 
-/* ==========================================================
+/* ============================================================
    CARDS
-   ========================================================== */
+   ============================================================ */
 
 .card {{
 
     background:
         linear-gradient(
             145deg,
-            rgba(24, 23, 48, 0.94),
-            rgba(38, 35, 67, 0.94)
+            rgba(5, 35, 80, 0.88),
+            rgba(8, 57, 115, 0.88)
         );
 
     border:
 
         1px solid
-        rgba(166, 137, 255, 0.35);
+        rgba(70, 170, 255, 0.5);
 
     border-radius: 22px;
 
@@ -283,27 +352,30 @@ st.markdown(
     margin: 10px 0;
 
     box-shadow:
-        0px 10px 35px rgba(0,0,0,0.45);
 
+        0px 10px 35px
+        rgba(0, 70, 160, 0.35);
+
+    backdrop-filter: blur(8px);
 }}
 
 
-/* ==========================================================
+/* ============================================================
    STAT CARDS
-   ========================================================== */
+   ============================================================ */
 
 .stat {{
 
     background:
         linear-gradient(
             145deg,
-            rgba(20,20,40,0.95),
-            rgba(40,38,70,0.95)
+            rgba(5, 38, 85, 0.92),
+            rgba(8, 63, 125, 0.92)
         );
 
     border:
         1px solid
-        rgba(160,130,255,0.35);
+        rgba(80, 180, 255, 0.55);
 
     border-radius: 20px;
 
@@ -312,13 +384,24 @@ st.markdown(
     text-align: center;
 
     box-shadow:
-        0px 8px 25px rgba(0,0,0,0.4);
+        0px 8px 25px
+        rgba(0,80,180,0.35);
+
+    transition:
+        transform 0.2s;
+}}
+
+
+.stat:hover {{
+
+    transform:
+        translateY(-5px);
 }}
 
 
 .stat-title {{
 
-    color: #aaa8c0;
+    color: #a9d9ff;
 
     font-size: 14px;
 
@@ -328,30 +411,33 @@ st.markdown(
 
 .stat-value {{
 
-    font-size: 32px;
+    font-size: 34px;
 
     font-weight: 900;
 
     color: white;
+
+    text-shadow:
+        0px 0px 10px #168fff;
 }}
 
 
-/* ==========================================================
+/* ============================================================
    GAME CARDS
-   ========================================================== */
+   ============================================================ */
 
 .game-card {{
 
     background:
         linear-gradient(
             145deg,
-            rgba(20,20,42,0.95),
-            rgba(42,38,72,0.95)
+            rgba(5, 35, 80, 0.93),
+            rgba(9, 67, 130, 0.93)
         );
 
     border:
         1px solid
-        rgba(164,130,255,0.35);
+        rgba(60, 165, 255, 0.55);
 
     border-radius: 24px;
 
@@ -362,7 +448,8 @@ st.markdown(
     min-height: 160px;
 
     box-shadow:
-        0px 10px 30px rgba(0,0,0,0.4);
+        0px 10px 30px
+        rgba(0,60,150,0.4);
 
     transition:
         transform 0.2s,
@@ -373,12 +460,12 @@ st.markdown(
 .game-card:hover {{
 
     transform:
-        translateY(-6px)
+        translateY(-7px)
         scale(1.01);
 
     box-shadow:
         0px 15px 40px
-        rgba(120,70,220,0.35);
+        rgba(0,130,255,0.35);
 }}
 
 
@@ -394,7 +481,7 @@ st.markdown(
 
 .game-description {{
 
-    color: #bcb9d0;
+    color: #b8dcff;
 
     font-size: 13px;
 
@@ -402,9 +489,9 @@ st.markdown(
 }}
 
 
-/* ==========================================================
-   STREAMLIT BUTTONS
-   ========================================================== */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 .stButton > button {{
 
@@ -412,18 +499,18 @@ st.markdown(
 
     border:
         1px solid
-        rgba(170,140,255,0.4);
+        rgba(70, 175, 255, 0.65);
 
     background:
         linear-gradient(
             135deg,
-            #33205f,
-            #542d82
+            #0755b8,
+            #087bd1
         );
 
     color: white;
 
-    font-weight: 800;
+    font-weight: 900;
 
     min-height: 45px;
 
@@ -439,69 +526,69 @@ st.markdown(
         translateY(-3px);
 
     box-shadow:
-        0px 8px 20px
-        rgba(130,80,220,0.4);
+        0px 8px 25px
+        rgba(0,140,255,0.5);
 
     border-color:
-        #b98cff;
+        #65c5ff;
 }}
 
 
-/* ==========================================================
-   INPUT BOXES
-   ========================================================== */
+/* ============================================================
+   INPUTS
+   ============================================================ */
 
 .stTextInput input {{
 
     background:
-        rgba(20,20,38,0.9);
+        rgba(5, 30, 70, 0.9);
 
     color: white;
 
     border:
-        1px solid #514b75;
+        1px solid #237bc7;
 
     border-radius: 12px;
 }}
 
 
-/* ==========================================================
+/* ============================================================
    SIDEBAR
-   ========================================================== */
+   ============================================================ */
 
 section[data-testid="stSidebar"] {{
 
     background:
         linear-gradient(
             180deg,
-            rgba(10,9,25,0.98),
-            rgba(20,15,38,0.98)
+            rgba(3, 25, 58, 0.98),
+            rgba(3, 45, 90, 0.98)
         );
 
     border-right:
         1px solid
-        rgba(150,120,255,0.25);
+        rgba(40,150,255,0.35);
 }}
 
 
-/* ==========================================================
-   PROGRESS BAR
-   ========================================================== */
+/* ============================================================
+   PROGRESS
+   ============================================================ */
 
 .stProgress > div > div > div > div {{
 
     background:
         linear-gradient(
             90deg,
-            #6636bd,
-            #b98cff
+            #0066ff,
+            #32b7ff
         );
 }}
 
 
-/* ==========================================================
-   HIDE STREAMLIT DEFAULTS
-   ========================================================== */
+/* ============================================================
+   HIDE STREAMLIT UI
+   ============================================================ */
 
 #MainMenu {{
     visibility: hidden;
@@ -524,7 +611,9 @@ footer {{
 def show_title():
 
     st.markdown(
-        '<div class="aom-title">⚔️ ARENA OF MINDS ⚔️</div>',
+        '<div class="aom-title">'
+        '⚔️ ARENA OF MINDS ⚔️'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -537,7 +626,7 @@ def show_title():
 
 
 # ============================================================
-# FIRST TIME SETUP
+# SETUP
 # ============================================================
 
 def setup_page():
@@ -551,16 +640,29 @@ def setup_page():
         unsafe_allow_html=True
     )
 
-    left, center, right = st.columns([1, 2, 1])
+    left, center, right = st.columns(
+        [1, 2, 1]
+    )
 
     with center:
 
         st.markdown(
             """
-            <div class="card">
-            <h2 style="text-align:center;">
-            🌙 ENTER THE ARENA 🌙
-            </h2>
+            <div class="card"
+                 style="text-align:center;">
+
+                <div style="font-size:60px;">
+                🌙
+                </div>
+
+                <h2>
+                ENTER THE ARENA
+                </h2>
+
+                <p>
+                Begin your journey.
+                </p>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -594,10 +696,15 @@ def setup_page():
             else:
 
                 player["name"] = name.strip()
+
                 player["grade"] = grade.strip()
+
                 player["xp"] = 0
+
                 player["aura"] = 0
+
                 player["level"] = 1
+
                 player["challenges_completed"] = 0
 
                 save_data()
@@ -619,8 +726,10 @@ def show_sidebar():
             """
             <div style="
                 text-align:center;
-                font-size:25px;
+                font-size:26px;
                 font-weight:900;
+                color:#55baff;
+                text-shadow:0 0 12px #008cff;
             ">
             ⚔️ ARENA
             </div>
@@ -644,6 +753,7 @@ def show_sidebar():
             "🏠 HOME",
             use_container_width=True
         ):
+
             st.session_state.page = "home"
             st.rerun()
 
@@ -651,6 +761,7 @@ def show_sidebar():
             "📚 STUDY",
             use_container_width=True
         ):
+
             st.session_state.page = "study"
             st.rerun()
 
@@ -658,6 +769,7 @@ def show_sidebar():
             "⚔️ CHALLENGES",
             use_container_width=True
         ):
+
             st.session_state.page = "challenges"
             st.rerun()
 
@@ -665,6 +777,7 @@ def show_sidebar():
             "🏆 RANKS",
             use_container_width=True
         ):
+
             st.session_state.page = "ranks"
             st.rerun()
 
@@ -672,6 +785,7 @@ def show_sidebar():
             "👤 PROFILE",
             use_container_width=True
         ):
+
             st.session_state.page = "profile"
             st.rerun()
 
@@ -679,6 +793,7 @@ def show_sidebar():
             "🌙 CHILL",
             use_container_width=True
         ):
+
             st.session_state.page = "chill"
             st.rerun()
 
@@ -708,12 +823,17 @@ def home_page():
     st.markdown(
         f"""
         <div class="card">
-            <h2>Welcome, {player['name']}! 👋</h2>
+
+            <h2>
+            Welcome, {player['name']}! 👋
+            </h2>
+
             <p>
             🎓 Grade {player['grade']}
             &nbsp; • &nbsp;
             🏆 Level {player['level']}
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -728,12 +848,15 @@ def home_page():
         st.markdown(
             f"""
             <div class="stat">
+
                 <div class="stat-title">
-                    ⭐ XP
+                ⭐ XP
                 </div>
+
                 <div class="stat-value">
-                    {player['xp']}
+                {player['xp']}
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -744,12 +867,15 @@ def home_page():
         st.markdown(
             f"""
             <div class="stat">
+
                 <div class="stat-title">
-                    ✨ AURA
+                ✨ AURA
                 </div>
+
                 <div class="stat-value">
-                    {player['aura']}
+                {player['aura']}
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -760,12 +886,15 @@ def home_page():
         st.markdown(
             f"""
             <div class="stat">
+
                 <div class="stat-title">
-                    🏆 LEVEL
+                🏆 LEVEL
                 </div>
+
                 <div class="stat-value">
-                    {player['level']}
+                {player['level']}
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -780,11 +909,15 @@ def home_page():
     st.markdown(
         f"""
         <div class="card">
+
         <b>
         🏆 LEVEL {player['level']} PROGRESS
         </b>
+
         <br><br>
+
         ⭐ {player['xp']} / {required} XP
+
         </div>
         """,
         unsafe_allow_html=True
@@ -806,13 +939,19 @@ def home_page():
         st.markdown(
             """
             <div class="game-card">
-                <div style="font-size:45px;">📚</div>
+
+                <div style="font-size:45px;">
+                📚
+                </div>
+
                 <div class="game-title">
-                    STUDY
+                STUDY
                 </div>
+
                 <div class="game-description">
-                    Turn learning into games.
+                Turn learning into games.
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -823,6 +962,7 @@ def home_page():
             key="home_study",
             use_container_width=True
         ):
+
             st.session_state.page = "study"
             st.rerun()
 
@@ -831,13 +971,19 @@ def home_page():
         st.markdown(
             """
             <div class="game-card">
-                <div style="font-size:45px;">⚔️</div>
+
+                <div style="font-size:45px;">
+                ⚔️
+                </div>
+
                 <div class="game-title">
-                    CHALLENGES
+                CHALLENGES
                 </div>
+
                 <div class="game-description">
-                    Complete challenges and earn rewards.
+                Complete challenges and earn rewards.
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -848,6 +994,7 @@ def home_page():
             key="home_challenges",
             use_container_width=True
         ):
+
             st.session_state.page = "challenges"
             st.rerun()
 
@@ -856,13 +1003,19 @@ def home_page():
         st.markdown(
             """
             <div class="game-card">
-                <div style="font-size:45px;">🌙</div>
+
+                <div style="font-size:45px;">
+                🌙
+                </div>
+
                 <div class="game-title">
-                    CHILL
+                CHILL
                 </div>
+
                 <div class="game-description">
-                    Take a break from the arena.
+                Take a break from the arena.
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -873,12 +1026,13 @@ def home_page():
             key="home_chill",
             use_container_width=True
         ):
+
             st.session_state.page = "chill"
             st.rerun()
 
 
 # ============================================================
-# STUDY ARENA
+# STUDY
 # ============================================================
 
 def study_page():
@@ -915,14 +1069,14 @@ def study_page():
         (
             "⚔️",
             "SST CHRONICLES",
-            "Travel through history, geography and civics.",
+            "History, geography and civics.",
             "sst"
         ),
 
         (
             "🇮🇳",
             "HINDI HUNT",
-            "Grammar, vocabulary and Hindi challenges.",
+            "Grammar and vocabulary.",
             "hindi"
         ),
 
@@ -935,7 +1089,11 @@ def study_page():
 
     ]
 
-    for row in range(0, len(games), 2):
+    for row in range(
+        0,
+        len(games),
+        2
+    ):
 
         cols = st.columns(2)
 
@@ -953,6 +1111,7 @@ def study_page():
                 st.markdown(
                     f"""
                     <div class="game-card">
+
                         <div style="font-size:45px;">
                         {icon}
                         </div>
@@ -964,6 +1123,7 @@ def study_page():
                         <div class="game-description">
                         {description}
                         </div>
+
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -1143,7 +1303,7 @@ GAME_NAMES = {
 
 
 # ============================================================
-# GAME PAGE
+# GAME
 # ============================================================
 
 def game_page():
@@ -1168,7 +1328,11 @@ def game_page():
     st.markdown(
         f"""
         <div class="card">
-        <h2>{question}</h2>
+
+        <h2>
+        {question}
+        </h2>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -1189,8 +1353,8 @@ def game_page():
                 )
 
                 add_rewards(
-                    xp=50,
-                    aura=5
+                    50,
+                    5
                 )
 
                 st.session_state.current_question = random.choice(
@@ -1202,8 +1366,7 @@ def game_page():
             else:
 
                 st.error(
-                    f"❌ Wrong answer! "
-                    f"The correct answer is: {answer}"
+                    f"❌ Wrong! Correct answer: {answer}"
                 )
 
     st.write("")
@@ -1271,9 +1434,13 @@ def challenges_page():
             f"""
             <div class="card">
 
-            <h3>{name}</h3>
+            <h3>
+            {name}
+            </h3>
 
-            <p>{description}</p>
+            <p>
+            {description}
+            </p>
 
             <b>
             ⭐ +{xp} XP
@@ -1429,8 +1596,6 @@ def chill_page():
 
     ]
 
-    quote = random.choice(quotes)
-
     st.markdown(
         f"""
         <div class="card"
@@ -1441,7 +1606,7 @@ def chill_page():
         </div>
 
         <h2>
-        {quote}
+        {random.choice(quotes)}
         </h2>
 
         </div>
@@ -1458,22 +1623,6 @@ def chill_page():
 
 
 # ============================================================
-# RESET PROFILE
-# ============================================================
-
-def reset_profile():
-
-    st.session_state.player = DEFAULT_DATA.copy()
-
-    if os.path.exists(SAVE_FILE):
-        os.remove(SAVE_FILE)
-
-    st.session_state.page = "home"
-
-    st.rerun()
-
-
-# ============================================================
 # APP ROUTER
 # ============================================================
 
@@ -1486,29 +1635,22 @@ else:
     show_sidebar()
 
     if st.session_state.page == "home":
-
         home_page()
 
     elif st.session_state.page == "study":
-
         study_page()
 
     elif st.session_state.page == "game":
-
         game_page()
 
     elif st.session_state.page == "challenges":
-
         challenges_page()
 
     elif st.session_state.page == "profile":
-
         profile_page()
 
     elif st.session_state.page == "ranks":
-
         ranks_page()
 
     elif st.session_state.page == "chill":
-
         chill_page()
