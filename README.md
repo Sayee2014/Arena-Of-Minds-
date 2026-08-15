@@ -2,7 +2,7 @@ import streamlit as st
 import random
 
 # =========================================================
-# PAGE SETUP
+# ARENA OF MINDS
 # =========================================================
 
 st.set_page_config(
@@ -15,32 +15,24 @@ st.set_page_config(
 # SESSION STATE
 # =========================================================
 
-if "name" not in st.session_state:
-    st.session_state.name = ""
+defaults = {
+    "name": "",
+    "grade": "",
+    "xp": 0,
+    "aura": 0,
+    "page": "home",
+    "subject": None,
+    "division": None,
+    "topic": None
+}
 
-if "grade" not in st.session_state:
-    st.session_state.grade = ""
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
 
-if "xp" not in st.session_state:
-    st.session_state.xp = 0
-
-if "aura" not in st.session_state:
-    st.session_state.aura = 0
-
-if "page" not in st.session_state:
-    st.session_state.page = "home"
-
-if "subject" not in st.session_state:
-    st.session_state.subject = None
-
-if "division" not in st.session_state:
-    st.session_state.division = None
-
-if "topic" not in st.session_state:
-    st.session_state.topic = None
 
 # =========================================================
-# CSS
+# STYLE
 # =========================================================
 
 st.markdown("""
@@ -48,7 +40,13 @@ st.markdown("""
 
 .stApp {
     background:
-        radial-gradient(circle at top, #0b5ed7 0%, #063b82 35%, #021a3d 75%, #010b1c 100%);
+        radial-gradient(
+            circle at top,
+            #0b5ed7 0%,
+            #063b82 35%,
+            #021a3d 75%,
+            #010b1c 100%
+        );
     color: white;
 }
 
@@ -57,7 +55,7 @@ st.markdown("""
     max-width: 1200px;
 }
 
-h1, h2, h3 {
+h1, h2, h3, p, label {
     color: white !important;
 }
 
@@ -69,7 +67,7 @@ h1, h2, h3 {
     color: white;
     text-shadow:
         4px 4px 0px #0755b8,
-        0px 0px 15px #24a8ff;
+        0px 0px 18px #24a8ff;
     animation: bounce 2s infinite;
 }
 
@@ -85,13 +83,22 @@ h1, h2, h3 {
 
 .subtitle {
     text-align: center;
-    color: #a9ddff;
+    color: #a9ddff !important;
     letter-spacing: 5px;
     font-weight: bold;
 }
 
+.section-title {
+    text-align: center;
+    font-family: "Comic Sans MS", cursive;
+    font-size: 35px;
+    font-weight: bold;
+    margin: 25px 0px;
+    text-shadow: 3px 3px 0px #0755b8;
+}
+
 .card {
-    background: rgba(4, 42, 91, 0.92);
+    background: rgba(4, 42, 91, 0.94);
     border: 1px solid #218cff;
     border-radius: 20px;
     padding: 25px;
@@ -110,26 +117,16 @@ h1, h2, h3 {
 .stat-number {
     font-size: 32px;
     font-weight: bold;
-    color: #ffffff;
 }
 
 .stat-label {
-    color: #9ddaff;
+    color: #9ddaff !important;
     font-weight: bold;
-}
-
-.section-title {
-    text-align: center;
-    font-family: "Comic Sans MS", cursive;
-    font-size: 35px;
-    font-weight: bold;
-    margin: 25px 0px;
-    text-shadow: 3px 3px 0px #0755b8;
 }
 
 .stButton > button {
     background: linear-gradient(135deg, #0755b8, #087bd1);
-    color: white;
+    color: white !important;
     border: 1px solid #48b5ff;
     border-radius: 13px;
     font-weight: bold;
@@ -144,12 +141,12 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 
+
 # =========================================================
 # TITLE
 # =========================================================
 
-def title():
-
+def show_title():
     st.markdown(
         '<div class="aom-title">⚔️ ARENA OF MINDS ⚔️</div>',
         unsafe_allow_html=True
@@ -160,105 +157,115 @@ def title():
         unsafe_allow_html=True
     )
 
+
 # =========================================================
-# STUDY DATABASE
+# CLASS 7 STUDY DATABASE
+#
+# STRUCTURE:
+#
+# SUBJECT
+#     ↓
+# DIVISION
+#     ↓
+# CHAPTER
+#     ↓
+# CHALLENGE
 # =========================================================
 
 study = {
 
-    "📐 Maths": {
+    # =====================================================
+    # MATHEMATICS
+    # =====================================================
 
-        "🔢 Arithmetic": [
+    "📐 Mathematics": {
+
+        "🔢 Number System": [
             "Integers",
             "Fractions",
-            "Decimals",
-            "Percentages",
+            "Decimals"
+        ],
+
+        "📊 Ratio, Percentage & Data": [
             "Ratio and Proportion",
-            "Profit and Loss"
+            "Percentage",
+            "Data Handling"
         ],
 
         "✖️ Algebra": [
-            "Variables",
-            "Expressions",
+            "Algebraic Expressions",
             "Simple Equations",
-            "Patterns",
-            "Exponents"
+            "Patterns"
         ],
 
         "📐 Geometry": [
             "Lines and Angles",
             "Triangles",
-            "Quadrilaterals",
-            "Circles",
             "Symmetry"
         ],
 
         "📏 Mensuration": [
             "Perimeter",
             "Area",
-            "Volume",
-            "Units of Measurement"
-        ],
-
-        "📊 Data Handling": [
-            "Tables",
-            "Bar Graphs",
-            "Mean",
-            "Median",
-            "Mode"
+            "Measurement"
         ]
     },
 
 
+    # =====================================================
+    # SCIENCE
+    # =====================================================
+
     "🔬 Science": {
 
         "⚙️ Physics": [
-            "Motion",
-            "Force",
-            "Work and Energy",
+            "Measurement of Time and Motion",
             "Light",
             "Heat",
             "Electricity",
-            "Magnets"
+            "Magnets",
+            "Force and Motion"
         ],
 
         "🧪 Chemistry": [
-            "Matter",
-            "Acids, Bases and Salts",
+            "Acids, Bases and Neutral",
             "Physical and Chemical Changes",
-            "Separation of Substances",
-            "Atoms and Molecules"
+            "Matter",
+            "Separation of Substances"
         ],
 
         "🧬 Biology": [
             "Plants",
             "Animals",
-            "Human Body",
             "Nutrition",
             "Respiration",
+            "Human Body",
             "Microorganisms"
         ],
 
-        "🌍 Environment": [
+        "🌱 Environment": [
             "Air",
             "Water",
             "Natural Resources",
-            "Pollution",
-            "Climate",
+            "Natural Vegetation",
             "Conservation"
         ]
     },
 
 
-    "🌍 SST": {
+    # =====================================================
+    # SOCIAL SCIENCE
+    # =====================================================
+
+    "🌍 Social Science": {
 
         "🏛️ History": [
-            "Early Civilisations",
-            "Cities and States",
+            "New Beginnings: Cities and Empires",
+            "Early Cities and States",
             "Empires",
             "Medieval India",
             "Colonial India",
-            "Indian Freedom Movement"
+            "The Indian Freedom Movement"
         ],
 
         "🗺️ Geography": [
@@ -274,11 +281,10 @@ study = {
         "⚖️ Civics": [
             "Democracy",
             "Government",
-            "Constitution",
+            "Equality",
             "Rights and Duties",
             "Local Government",
-            "Elections",
-            "Equality"
+            "Elections"
         ],
 
         "💰 Economics": [
@@ -291,14 +297,18 @@ study = {
     },
 
 
+    # =====================================================
+    # ENGLISH
+    # =====================================================
+
     "🇬🇧 English": {
 
         "📖 Literature": [
-            "Stories",
+            "The Fun They Had",
+            "Pierce Arrow",
+            "Stories and Characters",
             "Poetry",
-            "Characters",
-            "Themes",
-            "Literary Devices"
+            "Themes and Messages"
         ],
 
         "✍️ Grammar": [
@@ -314,10 +324,10 @@ study = {
         ],
 
         "📝 Writing": [
+            "Paragraph Writing",
             "Story Writing",
             "Letter Writing",
             "Diary Entry",
-            "Paragraph Writing",
             "Article Writing"
         ],
 
@@ -325,12 +335,11 @@ study = {
             "Synonyms",
             "Antonyms",
             "Homophones",
-            "Idioms",
-            "Prefixes and Suffixes"
+            "Idioms"
         ],
 
         "🔍 Reading": [
-            "Comprehension",
+            "Reading Comprehension",
             "Main Idea",
             "Inference",
             "Vocabulary in Context"
@@ -338,14 +347,16 @@ study = {
     },
 
 
+    # =====================================================
+    # HINDI
+    # =====================================================
+
     "🇮🇳 Hindi": {
 
-        "📖 साहित्य": [
-            "कहानी",
-            "कविता",
-            "पात्र",
-            "भावार्थ",
-            "संदेश"
+        "📖 पाठ / साहित्य": [
+            "सदर नमन",
+            "यह मेरा यह मीत का",
+            "मिठाईवाला"
         ],
 
         "✍️ व्याकरण": [
@@ -360,9 +371,9 @@ study = {
         ],
 
         "📝 लेखन": [
-            "निबंध",
+            "निबंध लेखन",
             "पत्र लेखन",
-            "अनुच्छेद",
+            "अनुच्छेद लेखन",
             "कहानी लेखन",
             "संवाद लेखन"
         ],
@@ -372,16 +383,10 @@ study = {
             "विलोम शब्द",
             "मुहावरे",
             "अनेक शब्दों के लिए एक शब्द"
-        ],
-
-        "📜 पठन": [
-            "अपठित गद्यांश",
-            "अपठित पद्यांश",
-            "शब्दार्थ",
-            "प्रश्न उत्तर"
         ]
     }
 }
+
 
 # =========================================================
 # QUESTION BANK
@@ -389,36 +394,60 @@ study = {
 
 questions = {
 
+    # ---------------- MATHS ----------------
+
     "Integers": [
-        ("What is -8 + 13?", ["3", "5", "-5", "21"], "5"),
-        ("What is 7 - 12?", ["5", "-5", "19", "-19"], "-5")
+        (
+            "What is -8 + 13?",
+            ["3", "5", "-5", "21"],
+            "5"
+        ),
+        (
+            "What is 7 - 12?",
+            ["5", "-5", "19", "-19"],
+            "-5"
+        )
     ],
 
     "Fractions": [
-        ("What is 1/2 + 1/2?", ["1", "1/2", "2", "0"], "1")
+        (
+            "What is 1/2 + 1/2?",
+            ["1", "1/2", "2", "0"],
+            "1"
+        )
     ],
 
     "Decimals": [
-        ("What is 2.5 + 1.5?", ["3", "4", "4.5", "5"], "4")
-    ],
-
-    "Percentages": [
-        ("What is 25% of 100?", ["10", "20", "25", "50"], "25")
-    ],
-
-    "Motion": [
         (
-            "Which instrument is used to measure time?",
+            "What is 2.5 + 1.5?",
+            ["3", "4", "4.5", "5"],
+            "4"
+        )
+    ],
+
+    "Percentage": [
+        (
+            "What is 25% of 100?",
+            ["10", "20", "25", "50"],
+            "25"
+        )
+    ],
+
+    # ---------------- SCIENCE ----------------
+
+    "Measurement of Time and Motion": [
+        (
+            "Which instrument is commonly used to measure time?",
             ["Ruler", "Clock", "Thermometer", "Balance"],
             "Clock"
         )
     ],
 
-    "Force": [
+    "Acids, Bases and Neutral": [
         (
-            "A push or pull is called:",
-            ["Energy", "Force", "Motion", "Heat"],
-            "Force"
+            "Which substance is acidic?",
+            ["Lemon juice", "Soap", "Toothpaste", "Baking soda"],
+            "Lemon juice"
         )
     ],
 
@@ -430,14 +459,6 @@ questions = {
         )
     ],
 
-    "Acids, Bases and Salts": [
-        (
-            "Which of these is acidic?",
-            ["Lemon juice", "Soap", "Toothpaste", "Baking soda"],
-            "Lemon juice"
-        )
-    ],
-
     "Plants": [
         (
             "Which part of a plant absorbs water?",
@@ -446,17 +467,11 @@ questions = {
         )
     ],
 
-    "Human Body": [
-        (
-            "Which organ pumps blood?",
-            ["Brain", "Heart", "Lungs", "Stomach"],
-            "Heart"
-        )
-    ],
+    # ---------------- SST ----------------
 
     "Landforms": [
         (
-            "Which landform is usually higher and steeper than a hill?",
+            "Which landform is generally higher and steeper than a hill?",
             ["Plain", "Mountain", "Valley", "Delta"],
             "Mountain"
         )
@@ -470,6 +485,14 @@ questions = {
         )
     ],
 
+    "Geographical Diversity of India": [
+        (
+            "Which of these is a major physical division of India?",
+            ["Himalayas", "Equator", "Atlantic Ocean", "Sahara"],
+            "Himalayas"
+        )
+    ],
+
     "Democracy": [
         (
             "What is an important feature of democracy?",
@@ -480,6 +503,21 @@ questions = {
                 "There are no laws"
             ],
             "People choose representatives"
+        )
+    ],
+
+    # ---------------- ENGLISH ----------------
+
+    "The Fun They Had": [
+        (
+            "Who wrote 'The Fun They Had'?",
+            [
+                "Isaac Asimov",
+                "William Shakespeare",
+                "Ruskin Bond",
+                "R. K. Narayan"
+            ],
+            "Isaac Asimov"
         )
     ],
 
@@ -511,6 +549,8 @@ questions = {
             "I ate food."
         )
     ],
+
+    # ---------------- HINDI ----------------
 
     "संज्ञा": [
         (
@@ -553,13 +593,14 @@ questions = {
     ]
 }
 
+
 # =========================================================
-# LOGIN / PLAYER SETUP
+# SETUP
 # =========================================================
 
 def setup():
 
-    title()
+    show_title()
 
     st.markdown(
         '<div class="section-title">⚔️ ENTER THE ARENA</div>',
@@ -570,15 +611,12 @@ def setup():
 
     with col2:
 
-        st.markdown(
-            """
-            <div class="card" style="text-align:center;">
+        st.markdown("""
+        <div class="card" style="text-align:center;">
             <h2>🌌 Welcome, Warrior!</h2>
             <p>Enter your details to begin your journey.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+        """, unsafe_allow_html=True)
 
         name = st.text_input("👤 Enter your name")
 
@@ -598,7 +636,6 @@ def setup():
                 st.rerun()
 
             else:
-
                 st.warning("Please enter your name and grade.")
 
 
@@ -610,17 +647,10 @@ def sidebar():
 
     with st.sidebar:
 
-        st.markdown(
-            "## ⚔️ ARENA OF MINDS"
-        )
+        st.markdown("## ⚔️ ARENA OF MINDS")
 
-        st.write(
-            f"👤 **{st.session_state.name}**"
-        )
-
-        st.write(
-            f"🎓 Grade {st.session_state.grade}"
-        )
+        st.write(f"👤 **{st.session_state.name}**")
+        st.write(f"🎓 Grade {st.session_state.grade}")
 
         st.divider()
 
@@ -634,19 +664,24 @@ def sidebar():
             st.rerun()
 
         if st.button("📚 Study", use_container_width=True):
+
             st.session_state.page = "study"
             st.session_state.subject = None
             st.session_state.division = None
             st.session_state.topic = None
+
             st.rerun()
 
         if st.button("⚔️ Challenges", use_container_width=True):
+
             st.session_state.page = "challenges"
             st.rerun()
 
         if st.button("🌙 Chill", use_container_width=True):
+
             st.session_state.page = "chill"
             st.rerun()
+
 
 # =========================================================
 # HOME
@@ -654,13 +689,13 @@ def sidebar():
 
 def home():
 
-    title()
+    show_title()
 
     st.markdown(
         f"""
         <div class="card">
-        <h2>Welcome back, {st.session_state.name}! 👋</h2>
-        <p>Ready to enter the Arena?</p>
+            <h2>Welcome back, {st.session_state.name}! 👋</h2>
+            <p>Ready to enter the Arena?</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -672,8 +707,8 @@ def home():
         st.markdown(
             f"""
             <div class="stat">
-            <div class="stat-label">⭐ XP</div>
-            <div class="stat-number">{st.session_state.xp}</div>
+                <div class="stat-label">⭐ XP</div>
+                <div class="stat-number">{st.session_state.xp}</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -683,19 +718,21 @@ def home():
         st.markdown(
             f"""
             <div class="stat">
-            <div class="stat-label">✨ AURA</div>
-            <div class="stat-number">{st.session_state.aura}</div>
+                <div class="stat-label">✨ AURA</div>
+                <div class="stat-number">{st.session_state.aura}</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with c3:
+        level = (st.session_state.xp // 100) + 1
+
         st.markdown(
-            """
+            f"""
             <div class="stat">
-            <div class="stat-label">🏆 LEVEL</div>
-            <div class="stat-number">1</div>
+                <div class="stat-label">🏆 LEVEL</div>
+                <div class="stat-number">{level}</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -710,66 +747,49 @@ def home():
 
     with c1:
 
-        st.markdown(
-            """
-            <div class="card" style="text-align:center;">
+        st.markdown("""
+        <div class="card" style="text-align:center;">
             <h1>📚</h1>
             <h2>STUDY</h2>
-            <p>Learn and master every subject.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            <p>Master your Class 7 subjects.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        if st.button(
-            "ENTER STUDY",
-            use_container_width=True
-        ):
+        if st.button("ENTER STUDY", use_container_width=True):
 
             st.session_state.page = "study"
             st.rerun()
 
     with c2:
 
-        st.markdown(
-            """
-            <div class="card" style="text-align:center;">
+        st.markdown("""
+        <div class="card" style="text-align:center;">
             <h1>⚔️</h1>
             <h2>CHALLENGES</h2>
-            <p>Complete challenges and earn rewards.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            <p>Complete challenges and earn XP.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        if st.button(
-            "VIEW CHALLENGES",
-            use_container_width=True
-        ):
+        if st.button("VIEW CHALLENGES", use_container_width=True):
 
             st.session_state.page = "challenges"
             st.rerun()
 
     with c3:
 
-        st.markdown(
-            """
-            <div class="card" style="text-align:center;">
+        st.markdown("""
+        <div class="card" style="text-align:center;">
             <h1>🌙</h1>
             <h2>CHILL</h2>
             <p>Take a break from studying.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+        """, unsafe_allow_html=True)
 
-        if st.button(
-            "ENTER CHILL",
-            use_container_width=True
-        ):
+        if st.button("ENTER CHILL", use_container_width=True):
 
             st.session_state.page = "chill"
             st.rerun()
+
 
 # =========================================================
 # STUDY PAGE
@@ -777,16 +797,16 @@ def home():
 
 def study_page():
 
-    title()
+    show_title()
 
-    # -----------------------------------------------------
-    # SUBJECT
-    # -----------------------------------------------------
+    # =====================================================
+    # LEVEL 1 — SUBJECT
+    # =====================================================
 
     if st.session_state.subject is None:
 
         st.markdown(
-            '<div class="section-title">📚 CHOOSE SUBJECT</div>',
+            '<div class="section-title">📚 CHOOSE YOUR SUBJECT</div>',
             unsafe_allow_html=True
         )
 
@@ -810,9 +830,11 @@ def study_page():
                     st.markdown(
                         f"""
                         <div class="card" style="text-align:center;">
-                        <h1>{subject.split()[0]}</h1>
-                        <h2>{subject[2:]}</h2>
-                        <p>Enter this subject arena.</p>
+                            <h1>{subject.split()[0]}</h1>
+                            <h2>{subject[2:]}</h2>
+                            <p>
+                            {len(study[subject])} divisions
+                            </p>
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -829,9 +851,9 @@ def study_page():
 
         return
 
-    # -----------------------------------------------------
-    # DIVISION
-    # -----------------------------------------------------
+    # =====================================================
+    # LEVEL 2 — DIVISION
+    # =====================================================
 
     if st.session_state.division is None:
 
@@ -840,7 +862,7 @@ def study_page():
         st.markdown(
             f"""
             <div class="section-title">
-            {subject} → CHOOSE DIVISION
+                {subject} → CHOOSE DIVISION
             </div>
             """,
             unsafe_allow_html=True
@@ -871,12 +893,14 @@ def study_page():
 
                 with cols[i]:
 
+                    topics = study[subject][division]
+
                     st.markdown(
                         f"""
                         <div class="card" style="text-align:center;">
-                        <h1>{division.split()[0]}</h1>
-                        <h2>{division[2:]}</h2>
-                        <p>{len(study[subject][division])} topics</p>
+                            <h1>{division.split()[0]}</h1>
+                            <h2>{division[2:]}</h2>
+                            <p>{len(topics)} chapters / topics</p>
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -893,9 +917,9 @@ def study_page():
 
         return
 
-    # -----------------------------------------------------
-    # TOPIC
-    # -----------------------------------------------------
+    # =====================================================
+    # LEVEL 3 — CHAPTER
+    # =====================================================
 
     if st.session_state.topic is None:
 
@@ -905,7 +929,7 @@ def study_page():
         st.markdown(
             f"""
             <div class="section-title">
-            {division} → CHOOSE TOPIC
+                {division} → CHOOSE CHAPTER
             </div>
             """,
             unsafe_allow_html=True
@@ -939,9 +963,9 @@ def study_page():
                     st.markdown(
                         f"""
                         <div class="card" style="text-align:center;">
-                        <h1>🔥</h1>
-                        <h2>{topic}</h2>
-                        <p>Test your knowledge.</p>
+                            <h1>📖</h1>
+                            <h2>{topic}</h2>
+                            <p>Enter this chapter.</p>
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -955,9 +979,11 @@ def study_page():
 
                         st.session_state.topic = topic
                         st.session_state.page = "quiz"
+
                         st.rerun()
 
         return
+
 
 # =========================================================
 # QUIZ
@@ -967,42 +993,52 @@ def quiz_page():
 
     topic = st.session_state.topic
 
-    title()
+    show_title()
 
     st.markdown(
         f"""
         <div class="section-title">
-        ⚔️ {topic.upper()}
+            ⚔️ {topic.upper()}
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    # -----------------------------------------------------
+    # QUESTION AVAILABLE
+    # -----------------------------------------------------
 
     if topic not in questions:
 
         st.markdown(
             f"""
             <div class="card" style="text-align:center;">
-            <h1>🚧</h1>
-            <h2>{topic}</h2>
-            <p>
-            The challenge bank for this topic is coming soon!
-            </p>
+                <h1>🚧</h1>
+                <h2>{topic}</h2>
+                <p>
+                    The challenge bank for this chapter
+                    is coming soon!
+                </p>
             </div>
             """,
             unsafe_allow_html=True
         )
 
         if st.button(
-            "⬅️ BACK TO TOPICS",
+            "⬅️ BACK TO CHAPTERS",
             use_container_width=True
         ):
 
             st.session_state.topic = None
             st.session_state.page = "study"
+
             st.rerun()
 
         return
+
+    # -----------------------------------------------------
+    # QUESTION
+    # -----------------------------------------------------
 
     question, options, answer = random.choice(
         questions[topic]
@@ -1011,17 +1047,17 @@ def quiz_page():
     st.markdown(
         f"""
         <div class="card">
-        <h2>🧠 {question}</h2>
+            <h2>🧠 {question}</h2>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    for option in options:
+    for number, option in enumerate(options):
 
         if st.button(
-            option,
-            key=f"{topic}_{option}",
+            f"{chr(65 + number)}. {option}",
+            key=f"{topic}_{number}",
             use_container_width=True
         ):
 
@@ -1031,23 +1067,25 @@ def quiz_page():
                 st.session_state.aura += 5
 
                 st.success(
-                    "🔥 CORRECT! +50 XP | +5 AURA"
+                    "🔥 CORRECT! +50 XP  |  +5 AURA"
                 )
 
             else:
 
                 st.error(
-                    f"❌ Wrong! The correct answer is: {answer}"
+                    f"❌ Not quite! Correct answer: {answer}"
                 )
 
     if st.button(
-        "⬅️ BACK TO TOPICS",
+        "⬅️ BACK TO CHAPTERS",
         use_container_width=True
     ):
 
         st.session_state.topic = None
         st.session_state.page = "study"
+
         st.rerun()
+
 
 # =========================================================
 # CHALLENGES
@@ -1055,17 +1093,35 @@ def quiz_page():
 
 def challenges():
 
-    title()
+    show_title()
 
     st.markdown(
-        '<div class="section-title">⚔️ CHALLENGES</div>',
+        '<div class="section-title">⚔️ CHALLENGE ARENA</div>',
         unsafe_allow_html=True
     )
 
     challenge_list = [
-        ("🧠 Brain Boost", "Answer a study question", 50, 5),
-        ("🔥 Knowledge Hunter", "Explore a new topic", 75, 10),
-        ("⚡ Mind Warrior", "Complete a challenge", 100, 15)
+
+        (
+            "🧠 Brain Boost",
+            "Answer a study question",
+            50,
+            5
+        ),
+
+        (
+            "🔥 Knowledge Hunter",
+            "Explore a new chapter",
+            75,
+            10
+        ),
+
+        (
+            "⚡ Mind Warrior",
+            "Complete a challenge",
+            100,
+            15
+        )
     ]
 
     for i, (name, description, xp, aura) in enumerate(
@@ -1075,9 +1131,9 @@ def challenges():
         st.markdown(
             f"""
             <div class="card">
-            <h2>{name}</h2>
-            <p>{description}</p>
-            <b>⭐ +{xp} XP &nbsp;&nbsp; ✨ +{aura} Aura</b>
+                <h2>{name}</h2>
+                <p>{description}</p>
+                <b>⭐ +{xp} XP &nbsp;&nbsp; ✨ +{aura} Aura</b>
             </div>
             """,
             unsafe_allow_html=True
@@ -1093,8 +1149,10 @@ def challenges():
             st.session_state.aura += aura
 
             st.success(
-                f"🔥 Challenge complete! +{xp} XP | +{aura} Aura"
+                f"🔥 Challenge complete! "
+                f"+{xp} XP | +{aura} Aura"
             )
+
 
 # =========================================================
 # CHILL
@@ -1102,7 +1160,7 @@ def challenges():
 
 def chill():
 
-    title()
+    show_title()
 
     st.markdown(
         '<div class="section-title">🌙 CHILL ZONE</div>',
@@ -1120,8 +1178,8 @@ def chill():
     st.markdown(
         f"""
         <div class="card" style="text-align:center;">
-        <h1>🌌</h1>
-        <h2>{random.choice(messages)}</h2>
+            <h1>🌌</h1>
+            <h2>{random.choice(messages)}</h2>
         </div>
         """,
         unsafe_allow_html=True
@@ -1133,11 +1191,13 @@ def chill():
     ):
         st.rerun()
 
+
 # =========================================================
-# MAIN ROUTER
+# MAIN APP ROUTER
 # =========================================================
 
 if st.session_state.name == "":
+
     setup()
 
 else:
